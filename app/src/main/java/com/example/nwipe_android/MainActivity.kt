@@ -21,16 +21,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
         // See https://developer.android.com/reference/android/os/Environment
         // for the different storage locations.
-        var externalStoragePath = Environment.getDataDirectory()
-        StatFs stat = new StatFs(externalStoragePath.getPath())
-        val bytesAvailable =
-            stat.getBlockSize() as Long * stat.getAvailableBlocks() as Long
+        //var externalStoragePath = Environment.getDataDirectory()
+        //var stat = StatFs(externalStoragePath.getPath())
+        //val bytesAvailable =
+            //stat.getBlockSize() * stat.getAvailableBlocks()
 
         Log.i(LOG_TAG,"Main activity created.")
     }
