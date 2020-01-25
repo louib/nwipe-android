@@ -1,14 +1,20 @@
 package com.example.nwipe_android
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
+import android.os.Environment
+import android.os.StatFs
+import android.system.Os.stat
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 
+
 class MainActivity : AppCompatActivity() {
+
+    public val LOG_TAG = MainActivity::class.java.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,6 +25,14 @@ class MainActivity : AppCompatActivity() {
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
         }
+        // See https://developer.android.com/reference/android/os/Environment
+        // for the different storage locations.
+        var externalStoragePath = Environment.getDataDirectory()
+        StatFs stat = new StatFs(externalStoragePath.getPath())
+        val bytesAvailable =
+            stat.getBlockSize() as Long * stat.getAvailableBlocks() as Long
+
+        Log.i(LOG_TAG,"Main activity created.")
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
