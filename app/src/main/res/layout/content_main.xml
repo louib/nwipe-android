@@ -18,6 +18,6 @@
         android:id="@+id/start_wipe_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start wipe" />
+        android:text="@string/start_wipe_button_label" />
 
 </LinearLayout>
