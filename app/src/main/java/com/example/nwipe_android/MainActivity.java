@@ -15,6 +15,7 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    private boolean isWiping = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +47,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startWipe(View v) {
-        Log.i("MainActivity", "Starting wipe process.");
+        if (this.isWiping) {
+            Log.i("MainActivity", "Cancelling wipe process.");
+            this.isWiping = false;
+        } else {
+            Log.i("MainActivity", "Starting wipe process.");
+            this.isWiping = true;
+        }
     }
 }
