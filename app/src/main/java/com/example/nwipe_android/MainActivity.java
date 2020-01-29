@@ -47,11 +47,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startWipe(View v) {
+        // mainTextView = (TextView) findViewById(R.id.main_text_view);
+        // startWipeButton = (Button) findViewById(R.id.start_wipe_button);
         if (this.isWiping) {
             Log.i("MainActivity", "Cancelling wipe process.");
+            // mainTextView.setText("temp");
+            // startWipeButton.setText("Start Wipe");
             this.isWiping = false;
         } else {
             Log.i("MainActivity", "Starting wipe process.");
+            // mainTextView.setText("temp");
+            // startWipeButton.setText("Wiping...");
             this.isWiping = true;
         }
     }
