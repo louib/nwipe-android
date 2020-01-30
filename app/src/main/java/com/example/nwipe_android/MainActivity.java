@@ -13,6 +13,7 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.os.MemoryFile;
 import android.os.storage.StorageManager;
 import android.util.Log;
 import android.view.View;
@@ -21,9 +22,13 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static int WIPE_BUFFER_SIZE = 2048;
 
     private boolean isWiping = false;
     @Override
@@ -100,4 +105,29 @@ public class MainActivity extends AppCompatActivity {
     public int getFreeBytes() {
         return 0;
     }
+
+    public void wipe() throws IOException {
+        int availableBytesCount = this.getFreeBytes();
+
+        // TODO change the length.
+        MemoryFile wipeFile = new MemoryFile("nwipe-android-timestamp", availableBytesCount);
+        try {
+            // This method is deprecated in API level 29, so it might raise.
+            wipeFile.allowPurging(false);
+        } catch (IOException e) {
+            Log.i("MainActivity", "Could not set wipe file to non purgeable.");
+        }
+
+
+        InputStream inputStream = wipeFile.getInputStream();
+        int writtenBytesCount = 0;
+        while (writtenBytesCount < availableBytesCount) {
+
+
+        }
+
+
+    }
+
+
 }
