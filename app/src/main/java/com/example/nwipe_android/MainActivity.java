@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (!deviceIsPlugged()) {
             TextView errorTextView = (TextView) findViewById(R.id.error_text_view);
-            errorTextView.setText("The device is not plugger!");
+            errorTextView.setText("The device is not plugged!");
             Button startWipeButton = (Button) findViewById(R.id.start_wipe_button);
             startWipeButton.setClickable(false);
         }

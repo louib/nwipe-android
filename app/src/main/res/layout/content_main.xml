@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:textColor="#F44336"
         android:typeface="monospace"
-        android:visibility="invisible" />
+        android:visibility="visible" />
 
     <TextView
         android:id="@+id/main_text_view"
