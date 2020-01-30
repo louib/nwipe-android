@@ -24,6 +24,26 @@
         android:typeface="monospace"
         android:text="Hello World!" />
 
+    <View android:layout_weight="1"/>
+
+    <TextView
+        android:id="@+id/wipe_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:typeface="monospace"
+        android:text="" />
+
+    <ProgressBar
+        android:id="@+id/wipe_progress_bar"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:indeterminate="false"
+        android:visibility="invisible" />
+
     <Button
         android:id="@+id/start_wipe_button"
         android:layout_width="match_parent"
