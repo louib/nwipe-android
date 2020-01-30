@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // TODO also monitor that the devices stays plugged during the wiping process!
         if (!deviceIsPlugged()) {
             TextView errorTextView = (TextView) findViewById(R.id.error_text_view);
             errorTextView.setText("The device is not plugged!");
