@@ -1,5 +1,6 @@
 package com.example.nwipe_android;
 
+import android.app.usage.StorageStatsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -12,12 +13,15 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.os.storage.StorageManager;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -87,5 +91,13 @@ public class MainActivity extends AppCompatActivity {
 
         int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
         return status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL;
+    }
+
+    /*
+     * See https://developer.android.com/reference/android/os/storage/StorageManager#getAllocatableBytes
+     * For details about querying the available memory.
+     */
+    public int getFreeBytes() {
+        return 0;
     }
 }
