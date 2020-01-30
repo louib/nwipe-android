@@ -13,7 +13,9 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.os.Environment;
 import android.os.MemoryFile;
+import android.os.StatFs;
 import android.os.storage.StorageManager;
 import android.util.Log;
 import android.view.View;
@@ -22,8 +24,11 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Random;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
@@ -98,19 +103,11 @@ public class MainActivity extends AppCompatActivity {
         return status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL;
     }
 
-    /*
-     * See https://developer.android.com/reference/android/os/storage/StorageManager#getAllocatableBytes
-     * For details about querying the available memory.
-     */
-    public int getFreeBytes() {
-        return 0;
-    }
-
     public void wipe() throws IOException {
-        int availableBytesCount = this.getFreeBytes();
+        long availableBytesCount = MainActivity.getAvailableBytesCount();
 
-        // TODO change the length.
-        MemoryFile wipeFile = new MemoryFile("nwipe-android-timestamp", availableBytesCount);
+        // TODO handle the int/long cast.
+        MemoryFile wipeFile = new MemoryFile("nwipe-android-timestamp", (int)availableBytesCount);
         try {
             // This method is deprecated in API level 29, so it might raise.
             wipeFile.allowPurging(false);
@@ -118,16 +115,43 @@ public class MainActivity extends AppCompatActivity {
             Log.i("MainActivity", "Could not set wipe file to non purgeable.");
         }
 
+        Random rnd = new Random();
+        // TODO get an actual random seed.
+        rnd.setSeed(1);
+        byte[] bytesBuffer = new byte[WIPE_BUFFER_SIZE];
 
-        InputStream inputStream = wipeFile.getInputStream();
+        OutputStream outputStream = wipeFile.getOutputStream();
         int writtenBytesCount = 0;
         while (writtenBytesCount < availableBytesCount) {
+            int bytesToWriteCount = Math.min(WIPE_BUFFER_SIZE, ((int)availableBytesCount - writtenBytesCount));
+            rnd.nextBytes(bytesBuffer);
+            outputStream.write(bytesBuffer, writtenBytesCount, bytesToWriteCount);
 
-
+            writtenBytesCount += bytesToWriteCount;
         }
-
-
     }
 
+    /*
+     * Gets the total number of bytes available for writing in the
+     * internal memory.
+     */
+    public static long getAvailableBytesCount() {
+        File path = Environment.getDataDirectory();
+        StatFs stat = new StatFs(path.getPath());
+        long blockSize = stat.getBlockSizeLong();
+        long availableBlocks = stat.getAvailableBlocksLong();
+        return availableBlocks * blockSize;
+    }
+
+    /*
+     * Gets the total number of bytes of the internal memory.
+     */
+    public static long getTotalBytesCount() {
+        File path = Environment.getDataDirectory();
+        StatFs stat = new StatFs(path.getPath());
+        long blockSize = stat.getBlockSizeLong();
+        long totalBlocks = stat.getBlockCountLong();
+        return totalBlocks * blockSize;
+    }
 
 }
