@@ -10,6 +10,14 @@
     tools:showIn="@layout/activity_main">
 
     <TextView
+        android:id="@+id/error_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#F44336"
+        android:typeface="monospace"
+        android:visibility="invisible" />
+
+    <TextView
         android:id="@+id/main_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

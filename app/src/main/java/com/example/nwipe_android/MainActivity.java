@@ -1,5 +1,9 @@
 package com.example.nwipe_android;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -12,6 +16,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,6 +28,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        if (!deviceIsPlugged()) {
+            TextView errorTextView = (TextView) findViewById(R.id.error_text_view);
+            errorTextView.setText("The device is not plugger!");
+            Button startWipeButton = (Button) findViewById(R.id.start_wipe_button);
+            startWipeButton.setClickable(false);
+        }
     }
 
     @Override
@@ -60,5 +73,18 @@ public class MainActivity extends AppCompatActivity {
             // startWipeButton.setText("Wiping...");
             this.isWiping = true;
         }
+    }
+
+    /*
+     * See https://developer.android.com/training/monitoring-device-state/battery-monitoring#java
+     * for details on monitoring battery status.
+     */
+    public boolean deviceIsPlugged() {
+        Context context = getApplicationContext();
+        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = context.registerReceiver(null, intentFilter);
+
+        int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        return status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL;
     }
 }
