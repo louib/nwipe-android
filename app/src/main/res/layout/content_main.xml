@@ -24,7 +24,9 @@
         android:typeface="monospace"
         android:text="Hello World!" />
 
-    <View android:layout_weight="1"/>
+    <View android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent" />
 
     <TextView
         android:id="@+id/wipe_text_view"
