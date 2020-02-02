@@ -82,12 +82,12 @@ public class MainActivity extends AppCompatActivity {
             this.stopWipe();
         } else {
             Log.i("MainActivity", "Starting startWipe process.");
-            startWipeButton.setText("Cancel startWipe");
+            startWipeButton.setText(R.string.cancel_wipe_button_label);
             this.isWiping = true;
             try {
                 this.startWipe();
             } catch (IOException e) {
-                Log.i("MainActivity", "Could not startWipe device." + e.getMessage());
+                Log.i("MainActivity", "Could not start wipe on device." + e.getMessage());
             }
         }
 
@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
         ProgressBar wipeProgressBar = (ProgressBar) findViewById(R.id.wipe_progress_bar);
 
         wipeProgressBar.setVisibility(View.INVISIBLE);
-        startWipeButton.setText("Start startWipe");
+        startWipeButton.setText(R.string.start_wipe_button_label);
         this.isWiping = false;
     }
 
