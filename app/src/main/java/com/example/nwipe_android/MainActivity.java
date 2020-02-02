@@ -48,6 +48,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // TODO cleanup the wiping thread.
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -84,6 +90,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("MainActivity", "Could not startWipe device." + e.getMessage());
             }
         }
+
+        // TODO when the wipe is finished, change the behaviour of the wipe button to close
+        // the app, and call this.finish().
     }
 
     /*
