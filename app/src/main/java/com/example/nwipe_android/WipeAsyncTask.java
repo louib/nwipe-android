@@ -39,6 +39,7 @@ public class WipeAsyncTask extends AsyncTask <MainActivity, WipeStatus, WipeStat
         Log.i("MainActivity", String.format("Got %d bytes available for writing.", availableBytesCount));
         this.wipeStatus.totalBytes = availableBytesCountCasted;
         this.wipeStatus.wipedBytes = 0;
+        this.publishProgress(this.wipeStatus);
 
         // TODO handle the int/long cast.
         String wipeFileName = String.format("nwipe-android-%d", System.currentTimeMillis());
@@ -58,6 +59,10 @@ public class WipeAsyncTask extends AsyncTask <MainActivity, WipeStatus, WipeStat
 
                 this.wipeStatus.wipedBytes += bytesToWriteCount;
                 this.publishProgress(this.wipeStatus);
+
+                if (isCancelled()) {
+                    break;
+                }
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();

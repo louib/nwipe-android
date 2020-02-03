@@ -51,13 +51,13 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:indeterminate="false"
-        android:visibility="invisible" />
+        android:visibility="visible" />
 
     <Button
         android:id="@+id/start_wipe_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="startWipe"
+        android:onClick="onMainButtonClick"
         android:text="@string/start_wipe_button_label"
         android:typeface="monospace" />
 

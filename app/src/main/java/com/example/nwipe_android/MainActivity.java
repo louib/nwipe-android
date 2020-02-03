@@ -3,6 +3,7 @@ package com.example.nwipe_android;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Bundle;
 
@@ -81,17 +82,14 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void startWipe(View v) {
+    public void onMainButtonClick(View v) {
         Button startWipeButton = (Button) findViewById(R.id.start_wipe_button);
         if (this.isWiping) {
-            Log.i("MainActivity", "Cancelling startWipe process.");
+            Log.i("MainActivity", "Cancelling wipe process.");
             this.stopWipe();
         } else {
-            Log.i("MainActivity", "Starting startWipe process.");
-            startWipeButton.setText(R.string.cancel_wipe_button_label);
-            this.isWiping = true;
-            WipeStatus status = this.wipeAsyncTask.doInBackground(this);
-            // TODO determine if the task was successfully executed.
+            Log.i("MainActivity", "Starting wipe process.");
+            this.startWipe();
         }
 
         // TODO when the wipe is finished, change the behaviour of the wipe button to close
@@ -112,11 +110,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void stopWipe() {
-        Button startWipeButton = (Button) findViewById(R.id.start_wipe_button);
-        ProgressBar wipeProgressBar = (ProgressBar) findViewById(R.id.wipe_progress_bar);
+    public void startWipe() {
+        Button startWipeButton = findViewById(R.id.start_wipe_button);
+        ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
 
-        wipeProgressBar.setVisibility(View.INVISIBLE);
+        startWipeButton.setText(R.string.cancel_wipe_button_label);
+        this.isWiping = true;
+        // wipeProgressBar.setVisibility(View.VISIBLE);
+        this.wipeAsyncTask = new WipeAsyncTask();
+        this.wipeAsyncTask.execute(this);
+    }
+
+    public void stopWipe() {
+        Button startWipeButton = findViewById(R.id.start_wipe_button);
+        ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
+
+        // wipeProgressBar.setVisibility(View.INVISIBLE);
         startWipeButton.setText(R.string.start_wipe_button_label);
 
         if (this.wipeAsyncTask != null) {
@@ -127,15 +136,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setWipeProgress(WipeStatus status) {
-        ProgressBar wipeProgressBar = (ProgressBar) findViewById(R.id.wipe_progress_bar);
+        ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
         TextView wipeTextView = (TextView) findViewById(R.id.wipe_text_view);
 
         // This is the initial progress call we receive.
         if (status.wipedBytes == 0) {
-            wipeProgressBar.setVisibility(View.VISIBLE);
+            // wipeProgressBar.setVisibility(View.VISIBLE);
             wipeProgressBar.setMax(status.totalBytes);
             wipeTextView.setText(String.format("Got %d bytes available for writing.", status.totalBytes));
-
         }
         wipeProgressBar.setProgress(status.wipedBytes);
     }
