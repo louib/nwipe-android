@@ -13,6 +13,8 @@
         android:id="@+id/error_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         android:textColor="#F44336"
         android:typeface="monospace"
         android:visibility="visible" />
@@ -21,19 +23,24 @@
         android:id="@+id/main_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:typeface="monospace"
-        android:text="Hello World!" />
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:text="@string/welcome_label"
+        android:typeface="monospace" />
 
-    <View android:layout_weight="1"
+    <View
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_width="match_parent" />
+        android:layout_weight="1" />
 
     <TextView
         android:id="@+id/wipe_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:typeface="monospace"
-        android:text="" />
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:text=""
+        android:typeface="monospace" />
 
     <ProgressBar
         android:id="@+id/wipe_progress_bar"
@@ -51,7 +58,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="startWipe"
-        android:typeface="monospace"
-        android:text="@string/start_wipe_button_label" />
+        android:text="@string/start_wipe_button_label"
+        android:typeface="monospace" />
 
 </LinearLayout>

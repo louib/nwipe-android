@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void startWipe() throws IOException {
         Context context = getApplicationContext();
+        TextView wipeTextView = (TextView) findViewById(R.id.wipe_text_view);
 
         long availableBytesCount = MainActivity.getAvailableBytesCount();
         int availableBytesCountCasted = (int)availableBytesCount;
@@ -117,6 +118,8 @@ public class MainActivity extends AppCompatActivity {
             availableBytesCountCasted = Integer.MAX_VALUE;
         }
         Log.i("MainActivity", String.format("Got %d bytes available for writing.", availableBytesCount));
+        wipeTextView.setText(String.format("Got %d bytes available for writing.", availableBytesCount));
+
 
         ProgressBar wipeProgressBar = (ProgressBar) findViewById(R.id.wipe_progress_bar);
         wipeProgressBar.setVisibility(View.VISIBLE);
@@ -149,6 +152,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }
+
+        context.deleteFile(wipeFileName);
 
     }
 
