@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static int WIPE_BUFFER_SIZE = 4096;
 
+    public WipeAsyncTask wipeAsyncTask = null;
+
     private boolean isWiping = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +52,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // TODO cleanup the wiping thread.
+
+        if (this.wipeAsyncTask != null) {
+            this.wipeAsyncTask.cancel(true);
+            this.wipeAsyncTask = null;
+        }
     }
 
     @Override
@@ -84,11 +90,8 @@ public class MainActivity extends AppCompatActivity {
             Log.i("MainActivity", "Starting startWipe process.");
             startWipeButton.setText(R.string.cancel_wipe_button_label);
             this.isWiping = true;
-            try {
-                this.startWipe();
-            } catch (IOException e) {
-                Log.i("MainActivity", "Could not start wipe on device." + e.getMessage());
-            }
+            WipeStatus status = this.wipeAsyncTask.doInBackground(this);
+            // TODO determine if the task was successfully executed.
         }
 
         // TODO when the wipe is finished, change the behaviour of the wipe button to close
@@ -108,54 +111,6 @@ public class MainActivity extends AppCompatActivity {
         return status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL;
     }
 
-    public void startWipe() throws IOException {
-        Context context = getApplicationContext();
-        TextView wipeTextView = (TextView) findViewById(R.id.wipe_text_view);
-
-        long availableBytesCount = MainActivity.getAvailableBytesCount();
-        int availableBytesCountCasted = (int)availableBytesCount;
-        if (availableBytesCountCasted <= 0) {
-            availableBytesCountCasted = Integer.MAX_VALUE;
-        }
-        Log.i("MainActivity", String.format("Got %d bytes available for writing.", availableBytesCount));
-        wipeTextView.setText(String.format("Got %d bytes available for writing.", availableBytesCount));
-
-
-        ProgressBar wipeProgressBar = (ProgressBar) findViewById(R.id.wipe_progress_bar);
-        wipeProgressBar.setVisibility(View.VISIBLE);
-
-
-        wipeProgressBar.setMax(availableBytesCountCasted);
-
-
-        // TODO handle the int/long cast.
-        // TODO add real timestamp.
-        String wipeFileName = String.format("nwipe-android-%d", System.currentTimeMillis());
-        //File file = new File(context.getFilesDir(), wipeFileName);
-
-        Random rnd = new Random();
-        // TODO get an actual random seed.
-        rnd.setSeed(1);
-        byte[] bytesBuffer = new byte[WIPE_BUFFER_SIZE];
-
-        try (FileOutputStream fos = context.openFileOutput(wipeFileName, Context.MODE_PRIVATE)) {
-            int writtenBytesCount = 0;
-            while (writtenBytesCount < availableBytesCount) {
-
-
-                int bytesToWriteCount = Math.min(WIPE_BUFFER_SIZE, (availableBytesCountCasted - writtenBytesCount));
-                rnd.nextBytes(bytesBuffer);
-                fos.write(bytesBuffer, 0, bytesToWriteCount);
-
-                writtenBytesCount += bytesToWriteCount;
-                wipeProgressBar.setProgress(writtenBytesCount);
-
-            }
-        }
-
-        context.deleteFile(wipeFileName);
-
-    }
 
     public void stopWipe() {
         Button startWipeButton = (Button) findViewById(R.id.start_wipe_button);
@@ -163,30 +118,26 @@ public class MainActivity extends AppCompatActivity {
 
         wipeProgressBar.setVisibility(View.INVISIBLE);
         startWipeButton.setText(R.string.start_wipe_button_label);
+
+        if (this.wipeAsyncTask != null) {
+            this.wipeAsyncTask.cancel(true);
+            this.wipeAsyncTask = null;
+        }
         this.isWiping = false;
     }
 
-    /*
-     * Gets the total number of bytes available for writing in the
-     * internal memory.
-     */
-    public static long getAvailableBytesCount() {
-        File path = Environment.getDataDirectory();
-        StatFs stat = new StatFs(path.getPath());
-        long blockSize = stat.getBlockSizeLong();
-        long availableBlocks = stat.getAvailableBlocksLong();
-        return availableBlocks * blockSize;
-    }
+    public void setWipeProgress(WipeStatus status) {
+        ProgressBar wipeProgressBar = (ProgressBar) findViewById(R.id.wipe_progress_bar);
+        TextView wipeTextView = (TextView) findViewById(R.id.wipe_text_view);
 
-    /*
-     * Gets the total number of bytes of the internal memory.
-     */
-    public static long getTotalBytesCount() {
-        File path = Environment.getDataDirectory();
-        StatFs stat = new StatFs(path.getPath());
-        long blockSize = stat.getBlockSizeLong();
-        long totalBlocks = stat.getBlockCountLong();
-        return totalBlocks * blockSize;
+        // This is the initial progress call we receive.
+        if (status.wipedBytes == 0) {
+            wipeProgressBar.setVisibility(View.VISIBLE);
+            wipeProgressBar.setMax(status.totalBytes);
+            wipeTextView.setText(String.format("Got %d bytes available for writing.", status.totalBytes));
+
+        }
+        wipeProgressBar.setProgress(status.wipedBytes);
     }
 
 }
