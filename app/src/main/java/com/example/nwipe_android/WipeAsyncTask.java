@@ -19,6 +19,7 @@ import java.util.Random;
 public class WipeAsyncTask extends AsyncTask <MainActivity, WipeStatus, WipeStatus> {
 
     public static int WIPE_BUFFER_SIZE = 4096;
+    public static String WIPE_FILES_PREFIX = "nwipe-android-";
 
     private MainActivity mainActivity;
     private WipeStatus wipeStatus;
@@ -31,6 +32,14 @@ public class WipeAsyncTask extends AsyncTask <MainActivity, WipeStatus, WipeStat
         Context context = this.mainActivity.getApplicationContext();
         TextView wipeTextView = this.mainActivity.findViewById(R.id.wipe_text_view);
 
+        File filesDir = context.getFilesDir();
+        for (String fileName: filesDir.list()) {
+            if (fileName.startsWith(WIPE_FILES_PREFIX)) {
+                Log.i("WipeAsyncTask", String.format("Deleting old wipe file %s.", fileName));
+                context.deleteFile(fileName);
+            }
+        }
+
         long availableBytesCount = WipeAsyncTask.getAvailableBytesCount();
         int availableBytesCountCasted = (int)availableBytesCount;
         if (availableBytesCountCasted <= 0) {
@@ -42,7 +51,7 @@ public class WipeAsyncTask extends AsyncTask <MainActivity, WipeStatus, WipeStat
         this.publishProgress(this.wipeStatus);
 
         // TODO handle the int/long cast.
-        String wipeFileName = String.format("nwipe-android-%d", System.currentTimeMillis());
+        String wipeFileName = String.format("%s%d", WIPE_FILES_PREFIX, System.currentTimeMillis());
 
         Random rnd = new Random();
         // TODO get an actual random seed.
@@ -72,6 +81,7 @@ public class WipeAsyncTask extends AsyncTask <MainActivity, WipeStatus, WipeStat
             return this.wipeStatus;
         }
 
+        Log.i("WipeAsyncTask", String.format("Deleting wipe file %s.", wipeFileName));
         context.deleteFile(wipeFileName);
 
         this.wipeStatus.succeeded = true;

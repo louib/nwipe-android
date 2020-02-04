@@ -3,16 +3,12 @@ package com.example.nwipe_android;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.os.Environment;
-import android.os.MemoryFile;
-import android.os.StatFs;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
@@ -21,15 +17,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-
-    public static int WIPE_BUFFER_SIZE = 4096;
 
     public WipeAsyncTask wipeAsyncTask = null;
 
@@ -43,9 +32,9 @@ public class MainActivity extends AppCompatActivity {
 
         // TODO also monitor that the devices stays plugged during the wiping process!
         if (!deviceIsPlugged()) {
-            TextView errorTextView = (TextView) findViewById(R.id.error_text_view);
+            TextView errorTextView = findViewById(R.id.error_text_view);
             errorTextView.setText("The device is not plugged!");
-            Button startWipeButton = (Button) findViewById(R.id.start_wipe_button);
+            Button startWipeButton = findViewById(R.id.start_wipe_button);
             startWipeButton.setClickable(false);
         }
     }
@@ -83,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onMainButtonClick(View v) {
-        Button startWipeButton = (Button) findViewById(R.id.start_wipe_button);
+        Button startWipeButton = findViewById(R.id.start_wipe_button);
         if (this.isWiping) {
             Log.i("MainActivity", "Cancelling wipe process.");
             this.stopWipe();
@@ -123,9 +112,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void stopWipe() {
         Button startWipeButton = findViewById(R.id.start_wipe_button);
+        TextView wipeTextView = findViewById(R.id.wipe_text_view);
         ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
 
-        // wipeProgressBar.setVisibility(View.INVISIBLE);
+        wipeProgressBar.setProgress(0);
+        wipeTextView.setText("");
         startWipeButton.setText(R.string.start_wipe_button_label);
 
         if (this.wipeAsyncTask != null) {
@@ -137,13 +128,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void setWipeProgress(WipeStatus status) {
         ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
-        TextView wipeTextView = (TextView) findViewById(R.id.wipe_text_view);
+        TextView wipeTextView = findViewById(R.id.wipe_text_view);
 
-        // This is the initial progress call we receive.
-        if (status.wipedBytes == 0) {
-            // wipeProgressBar.setVisibility(View.VISIBLE);
-            wipeProgressBar.setMax(status.totalBytes);
-            wipeTextView.setText(String.format("Got %d bytes available for writing.", status.totalBytes));
+        // wipeProgressBar.setVisibility(View.VISIBLE);
+        wipeProgressBar.setMax(status.totalBytes);
+        if (status.totalBytes < (1024 * 1024)) {
+            wipeTextView.setText(String.format("Wiping %d bytes from internal storage.", status.totalBytes));
+        } else {
+            wipeTextView.setText(String.format("Wiping %d MB from internal storage.", status.totalBytes / (1024 * 1024)));
         }
         wipeProgressBar.setProgress(status.wipedBytes);
     }
