@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -30,8 +31,6 @@ public class WipeAsyncTask extends AsyncTask <MainActivity, WipeStatus, WipeStat
         this.wipeStatus = new WipeStatus();
 
         Context context = this.mainActivity.getApplicationContext();
-        TextView wipeTextView = this.mainActivity.findViewById(R.id.wipe_text_view);
-
         File filesDir = context.getFilesDir();
         for (String fileName: filesDir.list()) {
             if (fileName.startsWith(WIPE_FILES_PREFIX)) {
@@ -46,12 +45,11 @@ public class WipeAsyncTask extends AsyncTask <MainActivity, WipeStatus, WipeStat
         this.wipeStatus.wipedBytes = 0;
         this.publishProgress(this.wipeStatus);
 
-        // TODO handle the int/long cast.
         String wipeFileName = String.format("%s%d", WIPE_FILES_PREFIX, System.currentTimeMillis());
 
-        // TODO get an actual random seed.
-        int randomSeed = 1;
-
+        SecureRandom random = new SecureRandom();
+        // TODO verify that this is a proper way of seeding.
+        int randomSeed = random.nextInt();
 
         Log.i("WipeAsyncTask", "Starting wipe operation.");
         try (FileOutputStream fos = context.openFileOutput(wipeFileName, Context.MODE_PRIVATE)) {
