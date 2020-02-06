@@ -41,12 +41,8 @@ public class WipeAsyncTask extends AsyncTask <MainActivity, WipeStatus, WipeStat
         }
 
         long availableBytesCount = WipeAsyncTask.getAvailableBytesCount();
-        int availableBytesCountCasted = (int)availableBytesCount;
-        if (availableBytesCountCasted <= 0) {
-            availableBytesCountCasted = Integer.MAX_VALUE;
-        }
         Log.i("MainActivity", String.format("Got %d bytes available for writing.", availableBytesCount));
-        this.wipeStatus.totalBytes = availableBytesCountCasted;
+        this.wipeStatus.totalBytes = availableBytesCount;
         this.wipeStatus.wipedBytes = 0;
         this.publishProgress(this.wipeStatus);
 
@@ -65,8 +61,13 @@ public class WipeAsyncTask extends AsyncTask <MainActivity, WipeStatus, WipeStat
 
             while (this.wipeStatus.wipedBytes < this.wipeStatus.totalBytes) {
 
-                int bytesLeftToWrite = this.wipeStatus.totalBytes - this.wipeStatus.wipedBytes;
-                int bytesToWriteCount = Math.min(WIPE_BUFFER_SIZE, bytesLeftToWrite);
+                long bytesLeftToWrite = this.wipeStatus.totalBytes - this.wipeStatus.wipedBytes;
+                int bytesToWriteCount = WIPE_BUFFER_SIZE;
+                if (bytesLeftToWrite < WIPE_BUFFER_SIZE) {
+                    // No risk of overflow here since we just verified the size.
+                    bytesToWriteCount = (int)bytesLeftToWrite;
+                }
+
                 rnd.nextBytes(bytesBuffer);
                 fos.write(bytesBuffer, 0, bytesToWriteCount);
 
@@ -98,8 +99,12 @@ public class WipeAsyncTask extends AsyncTask <MainActivity, WipeStatus, WipeStat
 
             while (this.wipeStatus.wipedBytes < this.wipeStatus.totalBytes) {
 
-                int bytesLeftToRead = this.wipeStatus.totalBytes - this.wipeStatus.wipedBytes;
-                int bytesToReadCount = Math.min(WIPE_BUFFER_SIZE, bytesLeftToRead);
+                long bytesLeftToRead = this.wipeStatus.totalBytes - this.wipeStatus.wipedBytes;
+                int bytesToReadCount = WIPE_BUFFER_SIZE;
+                if (bytesLeftToRead < WIPE_BUFFER_SIZE) {
+                    bytesToReadCount = (int)bytesLeftToRead;
+                }
+
                 rnd.nextBytes(bytesBuffer);
 
 

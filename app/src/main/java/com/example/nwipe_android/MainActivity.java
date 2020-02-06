@@ -118,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
         // wipeProgressBar.setVisibility(View.VISIBLE);
         this.wipeAsyncTask = new WipeAsyncTask();
         this.wipeAsyncTask.execute(this);
-        Log.e("MainActivity", "After the execute function.");
     }
 
     public void stopWipe() {
@@ -146,9 +145,10 @@ public class MainActivity extends AppCompatActivity {
             wipeProgressBar.setVisibility(View.VISIBLE);
         }
 
-        wipeTextView.setText(status.toString());
-        wipeProgressBar.setMax(status.totalBytes);
-        wipeProgressBar.setProgress(status.wipedBytes);
+        int percentageCompletion = status.getCurrentPassPercentageCompletion();
+        wipeTextView.setText(status.toString() + String.format(" (%d%%)", percentageCompletion));
+        wipeProgressBar.setMax(100);
+        wipeProgressBar.setProgress(percentageCompletion);
     }
 
 }
