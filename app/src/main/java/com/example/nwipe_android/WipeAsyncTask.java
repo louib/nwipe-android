@@ -165,8 +165,17 @@ public class WipeAsyncTask extends AsyncTask <MainActivity, WipeStatus, WipeStat
         return totalBlocks * blockSize;
     }
 
-    public String getTextualAvailableMemory() {
+    public static String getTextualAvailableMemory() {
         long totalBytes = WipeAsyncTask.getAvailableBytesCount();
+        if (totalBytes < (1024 * 1024)) {
+            return String.format("%d bytes", totalBytes);
+        } else {
+            return String.format("%d MB", totalBytes / (1024 * 1024));
+        }
+    }
+
+    public static String getTextualTotalMemory() {
+        long totalBytes = WipeAsyncTask.getTotalBytesCount();
         if (totalBytes < (1024 * 1024)) {
             return String.format("%d bytes", totalBytes);
         } else {

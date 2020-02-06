@@ -37,6 +37,13 @@ public class MainActivity extends AppCompatActivity {
             Button startWipeButton = findViewById(R.id.start_wipe_button);
             startWipeButton.setClickable(false);
         }
+
+        TextView sizeTextView = findViewById(R.id.available_size_text_view);
+        sizeTextView.setText(String.format(
+                "%s/%s available for wiping.",
+                WipeAsyncTask.getTextualAvailableMemory(),
+                WipeAsyncTask.getTextualTotalMemory()
+        ));
     }
 
     @Override
@@ -47,13 +54,6 @@ public class MainActivity extends AppCompatActivity {
             this.wipeAsyncTask.cancel(true);
             this.wipeAsyncTask = null;
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
     }
 
     @Override
@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onMainButtonClick(View v) {
-        Button startWipeButton = findViewById(R.id.start_wipe_button);
         if (this.isWiping) {
             Log.i("MainActivity", "Cancelling wipe process.");
             this.stopWipe();
