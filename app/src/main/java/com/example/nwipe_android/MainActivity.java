@@ -85,6 +85,17 @@ public class MainActivity extends AppCompatActivity {
         // the app, and call this.finish().
     }
 
+    public void onWipeFinished() {
+        Button startWipeButton = findViewById(R.id.start_wipe_button);
+        TextView wipeTextView = findViewById(R.id.wipe_text_view);
+        ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
+
+        wipeTextView.setText("");
+        wipeProgressBar.setProgress(0);
+        startWipeButton.setText(R.string.start_wipe_button_label);
+
+    }
+
     /*
      * See https://developer.android.com/training/monitoring-device-state/battery-monitoring#java
      * for details on monitoring battery status.
@@ -108,10 +119,11 @@ public class MainActivity extends AppCompatActivity {
         // wipeProgressBar.setVisibility(View.VISIBLE);
         this.wipeAsyncTask = new WipeAsyncTask();
         this.wipeAsyncTask.execute(this);
+        Log.e("MainActivity", "After the execute function.");
     }
 
     public void stopWipe() {
-        Button startWipeButton = findViewById(R.id.start_wipe_button);
+        Button startWipeButton = findViewById(R.id.start_wipe_button)   ;
         TextView wipeTextView = findViewById(R.id.wipe_text_view);
         ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
 
@@ -130,13 +142,13 @@ public class MainActivity extends AppCompatActivity {
         ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
         TextView wipeTextView = findViewById(R.id.wipe_text_view);
 
-        // wipeProgressBar.setVisibility(View.VISIBLE);
-        wipeProgressBar.setMax(status.totalBytes);
-        if (status.totalBytes < (1024 * 1024)) {
-            wipeTextView.setText(String.format("Wiping %d bytes from internal storage.", status.totalBytes));
-        } else {
-            wipeTextView.setText(String.format("Wiping %d MB from internal storage.", status.totalBytes / (1024 * 1024)));
+        if (status.wipedBytes == 0) {
+            wipeProgressBar.setVisibility(View.INVISIBLE);
+            wipeProgressBar.setVisibility(View.VISIBLE);
         }
+
+        wipeTextView.setText(status.toString());
+        wipeProgressBar.setMax(status.totalBytes);
         wipeProgressBar.setProgress(status.wipedBytes);
     }
 
