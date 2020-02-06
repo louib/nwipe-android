@@ -79,10 +79,10 @@ public class WipeAsyncTask extends AsyncTask <MainActivity, WipeStatus, WipeStat
                 }
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            Log.e("WipeAsyncTask", String.format("Error while wiping: %s", e.toString()));
             return this.wipeStatus;
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e("WipeAsyncTask", String.format("Error while wiping: %s", e.toString()));
             return this.wipeStatus;
         }
 
@@ -106,8 +106,6 @@ public class WipeAsyncTask extends AsyncTask <MainActivity, WipeStatus, WipeStat
                 }
 
                 rnd.nextBytes(bytesBuffer);
-
-
                 fis.read(bytesInputBuffer, 0, bytesToReadCount);
 
 
