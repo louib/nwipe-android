@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.nwipe_android">
+    package="com.example.nwipe_android"
+    android:versionCode="0"
+    android:versionCodeMajor="1"
+    android:revisionCode="0"
+    android:versionName="beta">
 
     <application
         android:allowBackup="true"
