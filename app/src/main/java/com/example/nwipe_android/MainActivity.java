@@ -47,6 +47,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 
@@ -79,9 +86,14 @@ public class MainActivity extends AppCompatActivity {
             Log.i("MainActivity", "Starting wipe process.");
             this.startWipe();
         }
+    }
 
-        // TODO when the wipe is finished, change the behaviour of the wipe button to close
-        // the app, and call this.finish().
+    public void onCloseButtonClick(MenuItem item) {
+        if (this.wipeAsyncTask != null) {
+            this.wipeAsyncTask.cancel(true);
+            this.wipeAsyncTask = null;
+        }
+        this.finish();
     }
 
     public void onWipeFinished() {

@@ -4,4 +4,5 @@
     <string name="start_wipe_button_label">Start wipe</string>
     <string name="cancel_wipe_button_label">Cancel wipe</string>
     <string name="welcome_label">Welcome to nwipe-android!</string>
+    <string name="close_button_title">close</string>
 </resources>

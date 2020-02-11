@@ -3,8 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.nwipe_android.MainActivity">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/action_close"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:onClick="onCloseButtonClick"
+        android:orderInCategory="200"
+        android:title="@string/close_button_title"
+        app:showAsAction="ifRoom" />
 </menu>
