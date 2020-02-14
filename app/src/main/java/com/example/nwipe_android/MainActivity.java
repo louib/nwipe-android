@@ -1,5 +1,6 @@
 package com.example.nwipe_android;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
 
     public WipeAsyncTask wipeAsyncTask = null;
+    public BroadcastReceiver powerBroadcastReceiver = null;
 
     private boolean isWiping = false;
     @Override
@@ -30,12 +32,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // TODO also monitor that the devices stays plugged during the wiping process!
         if (!deviceIsPlugged()) {
-            TextView errorTextView = findViewById(R.id.error_text_view);
-            errorTextView.setText("The device is not plugged!");
-            Button startWipeButton = findViewById(R.id.start_wipe_button);
-            startWipeButton.setClickable(false);
+            this.showPowerDisconnectedMessage();
         }
 
         TextView sizeTextView = findViewById(R.id.available_size_text_view);
@@ -44,6 +42,26 @@ public class MainActivity extends AppCompatActivity {
                 WipeAsyncTask.getTextualAvailableMemory(),
                 WipeAsyncTask.getTextualTotalMemory()
         ));
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_POWER_CONNECTED);
+        intentFilter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+        this.powerBroadcastReceiver = new PowerBroadcastReceiver();
+        this.registerReceiver(this.powerBroadcastReceiver, intentFilter);
+    }
+
+    public void showPowerDisconnectedMessage() {
+        TextView errorTextView = findViewById(R.id.error_text_view);
+        errorTextView.setText("The device is not plugged!");
+        Button startWipeButton = findViewById(R.id.start_wipe_button);
+        startWipeButton.setClickable(false);
+    }
+
+    public void clearPowerDisconnectedMessage() {
+        TextView errorTextView = findViewById(R.id.error_text_view);
+        errorTextView.setText("");
+        Button startWipeButton = findViewById(R.id.start_wipe_button);
+        startWipeButton.setClickable(true);
     }
 
     @Override
@@ -56,11 +74,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        if (this.wipeAsyncTask != null) {
-            this.wipeAsyncTask.cancel(true);
-            this.wipeAsyncTask = null;
-        }
+        this.teardown();
     }
 
     @Override
@@ -78,11 +92,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void onCloseButtonClick(MenuItem item) {
+    public void teardown() {
         if (this.wipeAsyncTask != null) {
             this.wipeAsyncTask.cancel(true);
             this.wipeAsyncTask = null;
         }
+        unregisterReceiver(this.powerBroadcastReceiver);
+    }
+
+    public void onCloseButtonClick(MenuItem item) {
+        this.teardown();
         this.finish();
     }
 
@@ -91,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         TextView wipeTextView = findViewById(R.id.wipe_text_view);
         ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
 
+        this.isWiping = false;
         wipeTextView.setText("");
         wipeProgressBar.setProgress(0);
         startWipeButton.setText(R.string.start_wipe_button_label);
