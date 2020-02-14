@@ -8,5 +8,5 @@
         android:onClick="onCloseButtonClick"
         android:orderInCategory="200"
         android:title="@string/close_button_title"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 </menu>
