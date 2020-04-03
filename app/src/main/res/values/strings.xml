@@ -5,4 +5,7 @@
     <string name="cancel_wipe_button_label">Cancel wipe</string>
     <string name="welcome_label">Welcome to nwipe-android!</string>
     <string name="close_button_title">close</string>
+    <string name="number_passes_label">Number of passes:</string>
+    <string name="blanking_passes_label">Perform a final blanking pass</string>
+    <string name="verify_passes_label">Verify wiping and blanking passes</string>
 </resources>
