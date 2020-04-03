@@ -15,7 +15,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
 
-public class WipeAsyncTask extends AsyncTask <MainActivity, WipeStatus, WipeStatus> {
+public class WipeAsyncTask extends AsyncTask <WipeJob, WipeStatus, WipeStatus> {
 
     public static int WIPE_BUFFER_SIZE = 4096;
     public static String WIPE_FILES_PREFIX = "nwipe-android-";
@@ -24,9 +24,14 @@ public class WipeAsyncTask extends AsyncTask <MainActivity, WipeStatus, WipeStat
     private MainActivity mainActivity;
     private WipeStatus wipeStatus;
 
+    public WipeAsyncTask(MainActivity mainActivity) {
+        super();
+        this.mainActivity = mainActivity;
+    }
+
     @Override
-    protected WipeStatus doInBackground(MainActivity... mainActivity) {
-        this.mainActivity = mainActivity[0];
+    protected WipeStatus doInBackground(WipeJob... wipeJobs) {
+        WipeJob wipeJob = wipeJobs[0];
         this.wipeStatus = new WipeStatus();
 
         Context context = this.mainActivity.getApplicationContext();

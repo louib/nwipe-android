@@ -16,6 +16,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 
@@ -25,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     public BroadcastReceiver powerBroadcastReceiver = null;
 
     private boolean isWiping = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +35,11 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if (!deviceIsPlugged()) {
+        SeekBar numberPassesSeekBar = findViewById(R.id.passes_seek_bar);
+        numberPassesSeekBar.setMax(WipeJob.MAX_NUMBER_PASSES - 1);
+        numberPassesSeekBar.setProgress(WipeJob.DEFAULT_NUMBER_PASSES - 1);
+
+        if (!deviceIsPluggedIn()) {
             this.showPowerDisconnectedMessage();
         }
 
@@ -52,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void showPowerDisconnectedMessage() {
         TextView errorTextView = findViewById(R.id.error_text_view);
-        errorTextView.setText("The device is not plugged!");
+        errorTextView.setText("The device is not plugged in!");
         Button startWipeButton = findViewById(R.id.start_wipe_button);
         startWipeButton.setClickable(false);
     }
@@ -114,14 +121,13 @@ public class MainActivity extends AppCompatActivity {
         wipeTextView.setText("");
         wipeProgressBar.setProgress(0);
         startWipeButton.setText(R.string.start_wipe_button_label);
-
     }
 
     /*
      * See https://developer.android.com/training/monitoring-device-state/battery-monitoring#java
      * for details on monitoring battery status.
      */
-    public boolean deviceIsPlugged() {
+    public boolean deviceIsPluggedIn() {
         Context context = getApplicationContext();
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         Intent batteryStatus = context.registerReceiver(null, intentFilter);
@@ -136,9 +142,18 @@ public class MainActivity extends AppCompatActivity {
 
         startWipeButton.setText(R.string.cancel_wipe_button_label);
         this.isWiping = true;
-        // wipeProgressBar.setVisibility(View.VISIBLE);
-        this.wipeAsyncTask = new WipeAsyncTask();
-        this.wipeAsyncTask.execute(this);
+
+        SeekBar numberPassesSeekBar = findViewById(R.id.passes_seek_bar);
+        Switch verifySwitch = findViewById(R.id.verify_switch);
+        Switch blankingSwitch = findViewById(R.id.blanking_switch);
+
+        WipeJob wipeJob = new WipeJob();
+        wipeJob.number_passes = numberPassesSeekBar.getProgress() + 1;
+        wipeJob.verify = verifySwitch.isActivated();
+        wipeJob.blank = blankingSwitch.isActivated();
+
+        this.wipeAsyncTask = new WipeAsyncTask(this);
+        this.wipeAsyncTask.execute(wipeJob);
     }
 
     public void stopWipe() {
