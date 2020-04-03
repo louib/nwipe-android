@@ -130,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
         return status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL;
     }
 
-
     public void startWipe() {
         Button startWipeButton = findViewById(R.id.start_wipe_button);
         ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);

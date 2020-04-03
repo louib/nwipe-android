@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.StatFs;
 import android.util.Log;
-import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileInputStream;
