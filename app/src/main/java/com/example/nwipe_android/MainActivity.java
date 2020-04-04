@@ -117,13 +117,13 @@ public class MainActivity extends AppCompatActivity {
         this.finish();
     }
 
-    public void onWipeFinished() {
+    public void onWipeFinished(WipeJob wipeJob) {
         Button startWipeButton = findViewById(R.id.start_wipe_button);
         TextView wipeTextView = findViewById(R.id.wipe_text_view);
         ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
 
         this.isWiping = false;
-        wipeTextView.setText("");
+        wipeTextView.setText(wipeJob.errorMessage);
         wipeProgressBar.setProgress(0);
         startWipeButton.setText(R.string.start_wipe_button_label);
     }

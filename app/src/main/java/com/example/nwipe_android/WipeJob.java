@@ -16,9 +16,8 @@ public class WipeJob {
     /**
      * Completion status.
      */
-    public boolean completed = false;
-    public boolean succeeded = false;
     public int passes_completed = 0;
+    public String errorMessage = "";
 
     /**
      * Information on the current pass.
@@ -28,13 +27,15 @@ public class WipeJob {
     public boolean verifying = false;
 
     public String toString() {
-        if (this.completed && this.succeeded) {
-            return "Succeeded";
-        } else if (this.completed) {
-            return "Wiping finished with errors";
+        if (this.failed()) {
+            return this.errorMessage;
         }
 
-        if (this.passes_completed >= this.number_passes && this.blank) {
+        if (this.isCompleted()) {
+            return "Succeeded";
+        }
+
+        if (this.isBlankingPass() && this.blank) {
             if (this.verifying) {
                 return "Verifying Blanking pass";
             } else {
@@ -50,5 +51,20 @@ public class WipeJob {
 
     public int getCurrentPassPercentageCompletion() {
         return (int)(((double)this.wipedBytes / (double)this.totalBytes) * 100);
+    }
+
+    public boolean isBlankingPass() {
+        return this.passes_completed == this.number_passes;
+    }
+
+    public boolean isCompleted() {
+        if (this.blank) {
+            return this.passes_completed > this.number_passes;
+        }
+        return this.passes_completed == this.number_passes;
+    }
+
+    public boolean failed() {
+        return !this.errorMessage.isEmpty();
     }
 }

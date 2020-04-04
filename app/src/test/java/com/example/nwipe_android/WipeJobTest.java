@@ -46,8 +46,23 @@ public class WipeJobTest {
         wipeJob.verifying = true;
         Assert.assertEquals(wipeJob.toString(), "Verifying Blanking pass");
 
-        wipeJob.completed = true;
-        wipeJob.succeeded = true;
+        wipeJob.passes_completed++;
+        Assert.assertEquals(wipeJob.toString(), "Succeeded");
+    }
+
+    @Test
+    public void testJobWithoutBlanking() {
+        WipeJob wipeJob = new WipeJob();
+        wipeJob.number_passes = 4;
+        wipeJob.blank = false;
+        wipeJob.passes_completed = 3;
+
+        Assert.assertEquals(wipeJob.toString(), "Pass 4/4");
+
+        wipeJob.verifying = true;
+        Assert.assertEquals(wipeJob.toString(), "Verifying Pass 4/4");
+        wipeJob.passes_completed++;
+
         Assert.assertEquals(wipeJob.toString(), "Succeeded");
     }
 
