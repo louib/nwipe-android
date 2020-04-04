@@ -48,10 +48,12 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
             } catch (Exception e) {
                 wipeJob.errorMessage = String.format("Unknown error while wiping: %s", e.toString());
                 Log.e("WipeAsyncTask", wipeJob.errorMessage);
+                this.publishProgress(this.wipeJob);
                 return wipeJob;
             }
 
-            if (this.wipeJob.failed()) {
+            if (this.wipeJob.failed() || this.isCancelled()) {
+                this.publishProgress(this.wipeJob);
                 return this.wipeJob;
             }
         }

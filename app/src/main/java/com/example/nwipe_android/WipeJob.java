@@ -28,7 +28,7 @@ public class WipeJob {
 
     public String toString() {
         if (this.failed()) {
-            return this.errorMessage;
+            return "Failed";
         }
 
         if (this.isCompleted()) {
