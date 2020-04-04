@@ -15,14 +15,14 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
 
-public class WipeAsyncTask extends AsyncTask <WipeJob, WipeStatus, WipeStatus> {
+public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
 
     public static int WIPE_BUFFER_SIZE = 4096;
     public static String WIPE_FILES_PREFIX = "nwipe-android-";
     public static int NUMBER_OF_PASSES = 1;
 
     private MainActivity mainActivity;
-    private WipeStatus wipeStatus;
+    private WipeJob wipeJob;
 
     public WipeAsyncTask(MainActivity mainActivity) {
         super();
@@ -30,9 +30,8 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeStatus, WipeStatus> {
     }
 
     @Override
-    protected WipeStatus doInBackground(WipeJob... wipeJobs) {
-        WipeJob wipeJob = wipeJobs[0];
-        this.wipeStatus = new WipeStatus();
+    protected WipeJob doInBackground(WipeJob... wipeJobs) {
+        this.wipeJob = wipeJobs[0];
 
         Context context = this.mainActivity.getApplicationContext();
         File filesDir = context.getFilesDir();
@@ -45,9 +44,9 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeStatus, WipeStatus> {
 
         long availableBytesCount = WipeAsyncTask.getAvailableBytesCount();
         Log.i("MainActivity", String.format("Got %d bytes available for writing.", availableBytesCount));
-        this.wipeStatus.totalBytes = availableBytesCount;
-        this.wipeStatus.wipedBytes = 0;
-        this.publishProgress(this.wipeStatus);
+        this.wipeJob.totalBytes = availableBytesCount;
+        this.wipeJob.wipedBytes = 0;
+        this.publishProgress(this.wipeJob);
 
         String wipeFileName = String.format("%s%d", WIPE_FILES_PREFIX, System.currentTimeMillis());
 
@@ -61,9 +60,9 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeStatus, WipeStatus> {
             rnd.setSeed(randomSeed);
             byte[] bytesBuffer = new byte[WIPE_BUFFER_SIZE];
 
-            while (this.wipeStatus.wipedBytes < this.wipeStatus.totalBytes) {
+            while (this.wipeJob.wipedBytes < this.wipeJob.totalBytes) {
 
-                long bytesLeftToWrite = this.wipeStatus.totalBytes - this.wipeStatus.wipedBytes;
+                long bytesLeftToWrite = this.wipeJob.totalBytes - this.wipeJob.wipedBytes;
                 int bytesToWriteCount = WIPE_BUFFER_SIZE;
                 if (bytesLeftToWrite < WIPE_BUFFER_SIZE) {
                     // No risk of overflow here since we just verified the size.
@@ -73,8 +72,8 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeStatus, WipeStatus> {
                 rnd.nextBytes(bytesBuffer);
                 fos.write(bytesBuffer, 0, bytesToWriteCount);
 
-                this.wipeStatus.wipedBytes += bytesToWriteCount;
-                this.publishProgress(this.wipeStatus);
+                this.wipeJob.wipedBytes += bytesToWriteCount;
+                this.publishProgress(this.wipeJob);
 
                 if (isCancelled()) {
                     break;
@@ -82,15 +81,15 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeStatus, WipeStatus> {
             }
         } catch (FileNotFoundException e) {
             Log.e("WipeAsyncTask", String.format("Error while wiping: %s", e.toString()));
-            return this.wipeStatus;
+            return this.wipeJob;
         } catch (IOException e) {
             Log.e("WipeAsyncTask", String.format("Error while wiping: %s", e.toString()));
-            return this.wipeStatus;
+            return this.wipeJob;
         }
 
-        this.wipeStatus.wipedBytes = 0;
-        this.wipeStatus.currentOperation = WipeOperation.VERIFYING;
-        this.publishProgress(this.wipeStatus);
+        this.wipeJob.wipedBytes = 0;
+        this.wipeJob.verifying = true;
+        this.publishProgress(this.wipeJob);
 
         Log.i("WipeAsyncTask", "Starting verifying operation.");
         try (FileInputStream fis = context.openFileInput(wipeFileName)) {
@@ -99,9 +98,9 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeStatus, WipeStatus> {
             byte[] bytesBuffer = new byte[WIPE_BUFFER_SIZE];
             byte[] bytesInputBuffer = new byte[WIPE_BUFFER_SIZE];
 
-            while (this.wipeStatus.wipedBytes < this.wipeStatus.totalBytes) {
+            while (this.wipeJob.wipedBytes < this.wipeJob.totalBytes) {
 
-                long bytesLeftToRead = this.wipeStatus.totalBytes - this.wipeStatus.wipedBytes;
+                long bytesLeftToRead = this.wipeJob.totalBytes - this.wipeJob.wipedBytes;
                 int bytesToReadCount = WIPE_BUFFER_SIZE;
                 if (bytesLeftToRead < WIPE_BUFFER_SIZE) {
                     bytesToReadCount = (int)bytesLeftToRead;
@@ -113,11 +112,11 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeStatus, WipeStatus> {
 
                 if (!Arrays.equals(Arrays.copyOfRange(bytesBuffer, 0, bytesToReadCount), Arrays.copyOfRange(bytesInputBuffer, 0, bytesToReadCount))) {
                     Log.e("WipeAsyncTask", "Error while verifying wipe file: streams are not the same!");
-                    return this.wipeStatus;
+                    return this.wipeJob;
                 }
 
-                this.wipeStatus.wipedBytes += bytesToReadCount;
-                this.publishProgress(this.wipeStatus);
+                this.wipeJob.wipedBytes += bytesToReadCount;
+                this.publishProgress(this.wipeJob);
 
                 if (isCancelled()) {
                     break;
@@ -125,25 +124,25 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeStatus, WipeStatus> {
             }
         } catch (FileNotFoundException e) {
             Log.e("WipeAsyncTask", String.format("Error while verifying wipe file: %s", e.toString()));
-            return this.wipeStatus;
+            return this.wipeJob;
         } catch (IOException e) {
             Log.e("WipeAsyncTask", String.format("Error while verifying wipe file: %s", e.toString()));
-            return this.wipeStatus;
+            return this.wipeJob;
         }
 
         Log.i("WipeAsyncTask", String.format("Deleting wipe file %s.", wipeFileName));
         context.deleteFile(wipeFileName);
 
-        this.wipeStatus.succeeded = true;
-        return this.wipeStatus;
+        this.wipeJob.succeeded = true;
+        return this.wipeJob;
     }
 
-    protected void onProgressUpdate(WipeStatus... status) {
+    protected void onProgressUpdate(WipeJob... status) {
         this.mainActivity.setWipeProgress(status[0]);
     }
 
-    protected void onPostExecute(WipeStatus result) {
-        Log.e("WipeAsyncTask", String.format("Wiped %d bytes available for writing.", wipeStatus.wipedBytes));
+    protected void onPostExecute(WipeJob result) {
+        Log.e("WipeAsyncTask", String.format("Wiped %d bytes available for writing.", this.wipeJob.wipedBytes));
         this.mainActivity.onWipeFinished();
     }
 

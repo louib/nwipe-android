@@ -38,10 +38,15 @@ public class MainActivity extends AppCompatActivity {
         SeekBar numberPassesSeekBar = findViewById(R.id.passes_seek_bar);
         numberPassesSeekBar.setMax(WipeJob.MAX_NUMBER_PASSES - 1);
         numberPassesSeekBar.setProgress(WipeJob.DEFAULT_NUMBER_PASSES - 1);
+        Switch verifySwitch = findViewById(R.id.verify_switch);
+        verifySwitch.setChecked(WipeJob.DEFAULT_VERIFY);
+        Switch blankSwitch = findViewById(R.id.blanking_switch);
+        blankSwitch.setChecked(WipeJob.DEFAULT_BLANK);
 
-        if (!deviceIsPluggedIn()) {
-            this.showPowerDisconnectedMessage();
-        }
+        // This is not working in android studio :(
+        // if (!deviceIsPluggedIn()) {
+        //     this.showPowerDisconnectedMessage();
+        // }
 
         TextView sizeTextView = findViewById(R.id.available_size_text_view);
         sizeTextView.setText(String.format(
@@ -172,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
         this.isWiping = false;
     }
 
-    public void setWipeProgress(WipeStatus status) {
+    public void setWipeProgress(WipeJob status) {
         ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
         TextView wipeTextView = findViewById(R.id.wipe_text_view);
 
@@ -186,5 +191,4 @@ public class MainActivity extends AppCompatActivity {
         wipeProgressBar.setMax(100);
         wipeProgressBar.setProgress(percentageCompletion);
     }
-
 }
