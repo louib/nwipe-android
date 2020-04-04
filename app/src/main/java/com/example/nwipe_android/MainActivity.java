@@ -159,9 +159,19 @@ public class MainActivity extends AppCompatActivity {
 
         this.wipeAsyncTask = new WipeAsyncTask(this);
         this.wipeAsyncTask.execute(wipeJob);
+
+        numberPassesSeekBar.setEnabled(false);
+        verifySwitch.setEnabled(false);
+        blankingSwitch.setEnabled(false);
     }
 
     public void stopWipe() {
+        if (this.wipeAsyncTask != null) {
+            this.wipeAsyncTask.cancel(true);
+            this.wipeAsyncTask = null;
+        }
+        this.isWiping = false;
+
         Button startWipeButton = findViewById(R.id.start_wipe_button)   ;
         TextView wipeTextView = findViewById(R.id.wipe_text_view);
         ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
@@ -170,16 +180,21 @@ public class MainActivity extends AppCompatActivity {
         wipeTextView.setText("");
         startWipeButton.setText(R.string.start_wipe_button_label);
 
-        if (this.wipeAsyncTask != null) {
-            this.wipeAsyncTask.cancel(true);
-            this.wipeAsyncTask = null;
-        }
-        this.isWiping = false;
+        SeekBar numberPassesSeekBar = findViewById(R.id.passes_seek_bar);
+        Switch verifySwitch = findViewById(R.id.verify_switch);
+        Switch blankingSwitch = findViewById(R.id.blanking_switch);
+        numberPassesSeekBar.setEnabled(true);
+        verifySwitch.setEnabled(true);
+        blankingSwitch.setEnabled(true);
     }
 
     public void setWipeProgress(WipeJob status) {
         ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
         TextView wipeTextView = findViewById(R.id.wipe_text_view);
+
+        if (!this.isWiping) {
+            return;
+        }
 
         if (status.wipedBytes == 0) {
             wipeProgressBar.setVisibility(View.INVISIBLE);
