@@ -19,7 +19,6 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
 
     public static int WIPE_BUFFER_SIZE = 4096;
     public static String WIPE_FILES_PREFIX = "nwipe-android-";
-    public static int NUMBER_OF_PASSES = 1;
 
     private MainActivity mainActivity;
     private Context context;
@@ -44,14 +43,17 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
         }
 
         while (!wipeJob.isCompleted()) {
-            this.executeWipePass();
+            try {
+                this.executeWipePass();
+            } catch (Exception e) {
+                wipeJob.errorMessage = String.format("Unknown error while wiping: %s", e.toString());
+                Log.e("WipeAsyncTask", wipeJob.errorMessage);
+                return wipeJob;
+            }
+
             if (this.wipeJob.failed()) {
                 return this.wipeJob;
             }
-        }
-
-        if (this.wipeJob.blank) {
-            this.executeWipePass();
         }
 
         for (String fileName: filesDir.list()) {
@@ -116,7 +118,6 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
         }
 
         this.wipeJob.wipedBytes = 0;
-        this.wipeJob.verifying = true;
         this.publishProgress(this.wipeJob);
 
         if (!wipeJob.verify) {
@@ -125,6 +126,8 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
             context.deleteFile(wipeFileName);
             return;
         }
+
+        this.wipeJob.verifying = true;
 
         Log.i("WipeAsyncTask", "Starting verifying operation.");
         try (FileInputStream fis = context.openFileInput(wipeFileName)) {
@@ -168,6 +171,7 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
             return;
         }
 
+        this.wipeJob.verifying = false;
         wipeJob.passes_completed++;
         Log.i("WipeAsyncTask", String.format("Deleting wipe file %s.", wipeFileName));
         context.deleteFile(wipeFileName);
@@ -178,7 +182,6 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
     }
 
     protected void onPostExecute(WipeJob result) {
-        Log.e("WipeAsyncTask", String.format("Wiped %d bytes available for writing.", this.wipeJob.wipedBytes));
         this.mainActivity.onWipeFinished(result);
     }
 

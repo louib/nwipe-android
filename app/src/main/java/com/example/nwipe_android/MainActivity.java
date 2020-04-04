@@ -120,10 +120,11 @@ public class MainActivity extends AppCompatActivity {
     public void onWipeFinished(WipeJob wipeJob) {
         Button startWipeButton = findViewById(R.id.start_wipe_button);
         TextView wipeTextView = findViewById(R.id.wipe_text_view);
+        TextView errorTextView = findViewById(R.id.error_text_view);
         ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
 
         this.isWiping = false;
-        wipeTextView.setText(wipeJob.errorMessage);
+        errorTextView.setText(wipeJob.errorMessage);
         wipeProgressBar.setProgress(0);
         startWipeButton.setText(R.string.start_wipe_button_label);
     }
@@ -188,21 +189,23 @@ public class MainActivity extends AppCompatActivity {
         blankingSwitch.setEnabled(true);
     }
 
-    public void setWipeProgress(WipeJob status) {
+    public void setWipeProgress(WipeJob wipeJob) {
         ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
         TextView wipeTextView = findViewById(R.id.wipe_text_view);
+        TextView errorTextView = findViewById(R.id.error_text_view);
 
+        errorTextView.setText(wipeJob.errorMessage);
         if (!this.isWiping) {
             return;
         }
 
-        if (status.wipedBytes == 0) {
+        if (wipeJob.wipedBytes == 0) {
             wipeProgressBar.setVisibility(View.INVISIBLE);
             wipeProgressBar.setVisibility(View.VISIBLE);
         }
 
-        int percentageCompletion = status.getCurrentPassPercentageCompletion();
-        wipeTextView.setText(status.toString() + String.format(" (%d%%)", percentageCompletion));
+        int percentageCompletion = wipeJob.getCurrentPassPercentageCompletion();
+        wipeTextView.setText(wipeJob.toString() + String.format(" (%d%%)", percentageCompletion));
         wipeProgressBar.setMax(100);
         wipeProgressBar.setProgress(percentageCompletion);
     }
