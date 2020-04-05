@@ -43,6 +43,15 @@ public class MainActivityTest {
     @Test
     public void testNumberPassesSeekBar() {
         onView(withId(R.id.number_passes_seek_bar))
+                .check(new ViewAssertion() {
+                    @Override
+                    public void check(View view, NoMatchingViewException noViewFoundException) {
+                        SeekBar numberPassesSeekBar = (SeekBar) view;
+                        Assert.assertEquals(numberPassesSeekBar.getProgress(), 2);
+                    }
+                });
+
+        onView(withId(R.id.number_passes_seek_bar))
                 .perform(ViewActions.click())
                 .check(new ViewAssertion() {
                     @Override
