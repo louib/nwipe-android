@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        SeekBar numberPassesSeekBar = findViewById(R.id.passes_seek_bar);
+        SeekBar numberPassesSeekBar = findViewById(R.id.number_passes_seek_bar);
         numberPassesSeekBar.setMax(WipeJob.MAX_NUMBER_PASSES - 1);
         numberPassesSeekBar.setProgress(WipeJob.DEFAULT_NUMBER_PASSES - 1);
         Switch verifySwitch = findViewById(R.id.verify_switch);
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         startWipeButton.setText(R.string.cancel_wipe_button_label);
         this.isWiping = true;
 
-        SeekBar numberPassesSeekBar = findViewById(R.id.passes_seek_bar);
+        SeekBar numberPassesSeekBar = findViewById(R.id.number_passes_seek_bar);
         Switch verifySwitch = findViewById(R.id.verify_switch);
         Switch blankingSwitch = findViewById(R.id.blanking_switch);
 
@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
         wipeTextView.setText("");
         startWipeButton.setText(R.string.start_wipe_button_label);
 
-        SeekBar numberPassesSeekBar = findViewById(R.id.passes_seek_bar);
+        SeekBar numberPassesSeekBar = findViewById(R.id.number_passes_seek_bar);
         Switch verifySwitch = findViewById(R.id.verify_switch);
         Switch blankingSwitch = findViewById(R.id.blanking_switch);
         numberPassesSeekBar.setEnabled(true);

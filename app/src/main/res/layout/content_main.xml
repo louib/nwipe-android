@@ -19,7 +19,7 @@
         android:text="@string/number_passes_label" />
 
     <SeekBar
-        android:id="@+id/passes_seek_bar"
+        android:id="@+id/number_passes_seek_bar"
         style="@style/Widget.AppCompat.SeekBar.Discrete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
