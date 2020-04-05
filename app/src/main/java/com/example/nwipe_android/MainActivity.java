@@ -232,8 +232,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         int percentageCompletion = wipeJob.getCurrentPassPercentageCompletion();
-        wipeTextView.setText(wipeJob.toString() + String.format(" (%d%%)", percentageCompletion));
+        wipeTextView.setText(wipeJob.toString());
         wipeProgressBar.setMax(100);
-        wipeProgressBar.setProgress(percentageCompletion);
+        if (wipeJob.isCompleted()) {
+            wipeProgressBar.setProgress(100);
+        } else {
+            wipeProgressBar.setProgress(percentageCompletion);
+        }
     }
 }

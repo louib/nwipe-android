@@ -41,10 +41,10 @@ public class WipeJobTest {
         wipeJob.blank = true;
         wipeJob.passes_completed = 4;
 
-        Assert.assertEquals(wipeJob.toString(), "Blanking pass");
+        Assert.assertEquals(wipeJob.toString(), "Blanking pass (0%)");
 
         wipeJob.verifying = true;
-        Assert.assertEquals(wipeJob.toString(), "Verifying Blanking pass");
+        Assert.assertEquals(wipeJob.toString(), "Verifying Blanking pass (0%)");
 
         wipeJob.passes_completed++;
         Assert.assertEquals(wipeJob.toString(), "Succeeded");
@@ -57,13 +57,14 @@ public class WipeJobTest {
         wipeJob.blank = false;
         wipeJob.passes_completed = 3;
 
-        Assert.assertEquals(wipeJob.toString(), "Pass 4/4");
+        Assert.assertEquals(wipeJob.toString(), "Pass 4/4 (0%)");
 
         wipeJob.verifying = true;
-        Assert.assertEquals(wipeJob.toString(), "Verifying Pass 4/4");
+        Assert.assertEquals(wipeJob.toString(), "Verifying Pass 4/4 (0%)");
         wipeJob.passes_completed++;
 
         Assert.assertEquals(wipeJob.toString(), "Succeeded");
+        Assert.assertTrue(wipeJob.isCompleted());
     }
 
 }

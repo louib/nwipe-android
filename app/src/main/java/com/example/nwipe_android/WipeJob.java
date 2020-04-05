@@ -27,8 +27,10 @@ public class WipeJob {
     public boolean verifying = false;
 
     public String toString() {
+        String completionText = String.format(" (%d%%)", this.getCurrentPassPercentageCompletion());
+
         if (this.failed()) {
-            return "Failed";
+            return "Failed" + completionText;
         }
 
         if (this.isCompleted()) {
@@ -37,16 +39,21 @@ public class WipeJob {
 
         if (this.isBlankingPass() && this.blank) {
             if (this.verifying) {
-                return "Verifying Blanking pass";
+                return "Verifying Blanking pass" + completionText;
             } else {
-                return "Blanking pass";
+                return "Blanking pass" + completionText;
             }
         }
 
         if (this.verifying) {
-            return String.format("Verifying Pass %d/%d", this.passes_completed + 1, this.number_passes);
+            return String.format(
+                    "Verifying Pass %d/%d%s",
+                    this.passes_completed + 1,
+                    this.number_passes,
+                    completionText
+            );
         }
-        return String.format("Pass %d/%d", this.passes_completed + 1, this.number_passes);
+        return String.format("Pass %d/%d%s", this.passes_completed + 1, this.number_passes, completionText);
     }
 
     public int getCurrentPassPercentageCompletion() {
