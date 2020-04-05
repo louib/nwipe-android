@@ -35,13 +35,34 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        SeekBar numberPassesSeekBar = findViewById(R.id.number_passes_seek_bar);
-        numberPassesSeekBar.setMax(WipeJob.MAX_NUMBER_PASSES - 1);
-        numberPassesSeekBar.setProgress(WipeJob.DEFAULT_NUMBER_PASSES - 1);
         Switch verifySwitch = findViewById(R.id.verify_switch);
         verifySwitch.setChecked(WipeJob.DEFAULT_VERIFY);
         Switch blankSwitch = findViewById(R.id.blanking_switch);
         blankSwitch.setChecked(WipeJob.DEFAULT_BLANK);
+        SeekBar numberPassesSeekBar = findViewById(R.id.number_passes_seek_bar);
+        numberPassesSeekBar.setMax(WipeJob.MAX_NUMBER_PASSES - 1);
+
+        numberPassesSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                TextView numberPassesTextView = findViewById(R.id.number_passes_text_view);
+                String label = getString(R.string.number_passes_label);
+                numberPassesTextView.setText(label + " " + (progress + 1));
+            }
+        });
+        // The progress must be set after registering the listener to make sure the initial value of
+        // the label is updated.
+        numberPassesSeekBar.setProgress(WipeJob.DEFAULT_NUMBER_PASSES - 1);
 
         // This is not working in android studio :(
         // if (!deviceIsPluggedIn()) {
@@ -119,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void onWipeFinished(WipeJob wipeJob) {
         Button startWipeButton = findViewById(R.id.start_wipe_button);
-        TextView wipeTextView = findViewById(R.id.wipe_text_view);
         TextView errorTextView = findViewById(R.id.error_text_view);
         ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
 
@@ -127,6 +147,13 @@ public class MainActivity extends AppCompatActivity {
         errorTextView.setText(wipeJob.errorMessage);
         wipeProgressBar.setProgress(0);
         startWipeButton.setText(R.string.start_wipe_button_label);
+
+        SeekBar numberPassesSeekBar = findViewById(R.id.number_passes_seek_bar);
+        Switch verifySwitch = findViewById(R.id.verify_switch);
+        Switch blankingSwitch = findViewById(R.id.blanking_switch);
+        numberPassesSeekBar.setEnabled(true);
+        verifySwitch.setEnabled(true);
+        blankingSwitch.setEnabled(true);
     }
 
     /*

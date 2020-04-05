@@ -16,13 +16,13 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
-
     public static int WIPE_BUFFER_SIZE = 4096;
     public static String WIPE_FILES_PREFIX = "nwipe-android-";
 
     private MainActivity mainActivity;
     private Context context;
     private WipeJob wipeJob;
+    private int lastProgress = -1;
 
     public WipeAsyncTask(MainActivity mainActivity) {
         super();
@@ -34,23 +34,19 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
         this.wipeJob = wipeJobs[0];
         this.context = this.mainActivity.getApplicationContext();
 
-        File filesDir = context.getFilesDir();
-        for (String fileName: filesDir.list()) {
-            if (fileName.startsWith(WIPE_FILES_PREFIX)) {
-                Log.i("WipeAsyncTask", String.format("Deleting old wipe file %s.", fileName));
-                context.deleteFile(fileName);
-            }
-        }
+        this.deleteWipeFiles();
 
         while (!wipeJob.isCompleted()) {
             try {
                 this.executeWipePass();
             } catch (Exception e) {
+                this.deleteWipeFiles();
                 wipeJob.errorMessage = String.format("Unknown error while wiping: %s", e.toString());
                 Log.e("WipeAsyncTask", wipeJob.errorMessage);
                 this.publishProgress(this.wipeJob);
                 return wipeJob;
             }
+            this.deleteWipeFiles();
 
             if (this.wipeJob.failed() || this.isCancelled()) {
                 this.publishProgress(this.wipeJob);
@@ -58,14 +54,17 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
             }
         }
 
+        return this.wipeJob;
+    }
+
+    private void deleteWipeFiles() {
+        File filesDir = this.context.getFilesDir();
         for (String fileName: filesDir.list()) {
-            if (fileName.startsWith(WIPE_FILES_PREFIX)) {
+            if (fileName.startsWith(WipeAsyncTask.WIPE_FILES_PREFIX)) {
                 Log.i("WipeAsyncTask", String.format("Deleting old wipe file %s.", fileName));
-                context.deleteFile(fileName);
+                this.context.deleteFile(fileName);
             }
         }
-
-        return this.wipeJob;
     }
 
     private void executeWipePass() {
@@ -125,7 +124,6 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
         if (!wipeJob.verify) {
             wipeJob.passes_completed++;
             Log.i("WipeAsyncTask", String.format("Deleting wipe file %s.", wipeFileName));
-            context.deleteFile(wipeFileName);
             return;
         }
 
@@ -176,11 +174,15 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
         this.wipeJob.verifying = false;
         wipeJob.passes_completed++;
         Log.i("WipeAsyncTask", String.format("Deleting wipe file %s.", wipeFileName));
-        context.deleteFile(wipeFileName);
+        this.deleteWipeFiles();
     }
 
-    protected void onProgressUpdate(WipeJob... status) {
-        this.mainActivity.setWipeProgress(status[0]);
+    protected void onProgressUpdate(WipeJob... wipeJobs) {
+        if (lastProgress != -1 && lastProgress == wipeJobs[0].getCurrentPassPercentageCompletion() && !wipeJobs[0].failed()) {
+            return;
+        }
+        lastProgress = wipeJobs[0].getCurrentPassPercentageCompletion();
+        this.mainActivity.setWipeProgress(wipeJobs[0]);
     }
 
     protected void onPostExecute(WipeJob result) {
