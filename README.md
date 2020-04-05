@@ -4,6 +4,12 @@
 
 **This app is still beta software.**
 
+## Screenshots
+
+![start](./screenshots/start.png)
+![wiping](./screenshots/wiping.png)
+![success](./screenshots/success.png)
+
 ## License
 
 GPL-3.0
