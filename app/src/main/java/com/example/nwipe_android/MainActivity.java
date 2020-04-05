@@ -180,8 +180,8 @@ public class MainActivity extends AppCompatActivity {
 
         WipeJob wipeJob = new WipeJob();
         wipeJob.number_passes = numberPassesSeekBar.getProgress() + 1;
-        wipeJob.verify = verifySwitch.isActivated();
-        wipeJob.blank = blankingSwitch.isActivated();
+        wipeJob.verify = verifySwitch.isChecked();
+        wipeJob.blank = blankingSwitch.isChecked();
 
         this.wipeAsyncTask = new WipeAsyncTask(this);
         this.wipeAsyncTask.execute(wipeJob);

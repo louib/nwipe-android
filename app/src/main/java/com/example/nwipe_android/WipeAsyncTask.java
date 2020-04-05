@@ -47,9 +47,9 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
                 return wipeJob;
             }
             this.deleteWipeFiles();
+            this.publishProgress(this.wipeJob);
 
             if (this.wipeJob.failed() || this.isCancelled()) {
-                this.publishProgress(this.wipeJob);
                 return this.wipeJob;
             }
         }
@@ -68,7 +68,6 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
     }
 
     private void executeWipePass() {
-        // Not wiping everything when testing.
         long availableBytesCount = WipeAsyncTask.getAvailableBytesCount();
         Log.i("MainActivity", String.format("Got %d bytes available for writing.", availableBytesCount));
         this.wipeJob.totalBytes = availableBytesCount;
@@ -98,7 +97,10 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
                     bytesToWriteCount = (int)bytesLeftToWrite;
                 }
 
-                rnd.nextBytes(bytesBuffer);
+                if (!wipeJob.isBlankingPass()) {
+                    rnd.nextBytes(bytesBuffer);
+                }
+
                 fos.write(bytesBuffer, 0, bytesToWriteCount);
 
                 this.wipeJob.wipedBytes += bytesToWriteCount;
@@ -128,7 +130,6 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
 
         if (!wipeJob.verify) {
             wipeJob.passes_completed++;
-            Log.i("WipeAsyncTask", String.format("Deleting wipe file %s.", wipeFileName));
             return;
         }
 
@@ -149,7 +150,10 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
                     bytesToReadCount = (int)bytesLeftToRead;
                 }
 
-                rnd.nextBytes(bytesBuffer);
+                if (!wipeJob.isBlankingPass()) {
+                    rnd.nextBytes(bytesBuffer);
+                }
+
                 fis.read(bytesInputBuffer, 0, bytesToReadCount);
 
 
@@ -178,7 +182,6 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
 
         this.wipeJob.verifying = false;
         wipeJob.passes_completed++;
-        Log.i("WipeAsyncTask", String.format("Deleting wipe file %s.", wipeFileName));
         this.deleteWipeFiles();
     }
 
