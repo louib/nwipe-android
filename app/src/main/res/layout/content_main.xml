@@ -28,6 +28,8 @@
         android:layout_marginBottom="8dp"
         android:max="10"
         android:progress="3"
+        android:progressTint="#000000"
+        android:thumbTint="#000000"
         tools:visibility="visible" />
 
     <Switch
