@@ -141,11 +141,9 @@ public class MainActivity extends AppCompatActivity {
     public void onWipeFinished(WipeJob wipeJob) {
         Button startWipeButton = findViewById(R.id.start_wipe_button);
         TextView errorTextView = findViewById(R.id.error_text_view);
-        ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
 
         this.isWiping = false;
         errorTextView.setText(wipeJob.errorMessage);
-        wipeProgressBar.setProgress(0);
         startWipeButton.setText(R.string.start_wipe_button_label);
 
         SeekBar numberPassesSeekBar = findViewById(R.id.number_passes_seek_bar);

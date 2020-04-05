@@ -5,6 +5,10 @@ public class WipeJob {
     public static int DEFAULT_NUMBER_PASSES = 3;
     public static boolean DEFAULT_VERIFY = false;
     public static boolean DEFAULT_BLANK = true;
+    /**
+     * Minimum percentage of completion to consider a pass a successfully written.
+     */
+    public static int MIN_PERCENTAGE_COMPLETION = 98;
 
     /**
      * Parameters to the job.

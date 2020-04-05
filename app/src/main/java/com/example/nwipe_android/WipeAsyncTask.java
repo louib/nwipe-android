@@ -113,9 +113,14 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
             Log.e("WipeAsyncTask", wipeJob.errorMessage);
             return;
         } catch (IOException e) {
-            wipeJob.errorMessage = String.format("Error while wiping: %s", e.toString());
-            Log.e("WipeAsyncTask", wipeJob.errorMessage);
-            return;
+            // Handling no space left errors at the end of the pass.
+            if (e.toString().contains("ENOSP") && wipeJob.getCurrentPassPercentageCompletion() >= WipeJob.MIN_PERCENTAGE_COMPLETION) {
+                this.wipeJob.totalBytes = this.wipeJob.wipedBytes;
+            } else {
+                wipeJob.errorMessage = String.format("Error while wiping: %s", e.toString());
+                Log.e("WipeAsyncTask", wipeJob.errorMessage);
+                return;
+            }
         }
 
         this.wipeJob.wipedBytes = 0;
