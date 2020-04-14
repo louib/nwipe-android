@@ -16,10 +16,10 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
-    public static int WIPE_BUFFER_SIZE = 4096;
-    public static String WIPE_FILES_PREFIX = "nwipe-android-";
+    private static final int WIPE_BUFFER_SIZE = 4096;
+    private static final String WIPE_FILES_PREFIX = "nwipe-android-";
 
-    private MainActivity mainActivity;
+    private final MainActivity mainActivity;
     private Context context;
     private WipeJob wipeJob;
     private int lastProgress = -1;
@@ -110,10 +110,6 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
                     break;
                 }
             }
-        } catch (FileNotFoundException e) {
-            wipeJob.errorMessage = String.format("Error while wiping: %s", e.toString());
-            Log.e("WipeAsyncTask", wipeJob.errorMessage);
-            return;
         } catch (IOException e) {
             // Handling no space left errors at the end of the pass.
             if (e.toString().contains("ENOSP") && wipeJob.getCurrentPassPercentageCompletion() >= WipeJob.MIN_PERCENTAGE_COMPLETION) {
@@ -170,10 +166,6 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
                     break;
                 }
             }
-        } catch (FileNotFoundException e) {
-            wipeJob.errorMessage = String.format("Error while verifying wipe file: %s", e.toString());
-            Log.e("WipeAsyncTask", wipeJob.errorMessage);
-            return;
         } catch (IOException e) {
             wipeJob.errorMessage = String.format("Error while verifying wipe file: %s", e.toString());
             Log.e("WipeAsyncTask", wipeJob.errorMessage);
@@ -201,7 +193,7 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
      * Gets the total number of bytes available for writing in the
      * internal memory.
      */
-    public static long getAvailableBytesCount() {
+    private static long getAvailableBytesCount() {
         File path = Environment.getDataDirectory();
         StatFs stat = new StatFs(path.getPath());
         long blockSize = stat.getBlockSizeLong();
@@ -212,7 +204,7 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
     /*
      * Gets the total number of bytes of the internal memory.
      */
-    public static long getTotalBytesCount() {
+    private static long getTotalBytesCount() {
         File path = Environment.getDataDirectory();
         StatFs stat = new StatFs(path.getPath());
         long blockSize = stat.getBlockSizeLong();

@@ -23,8 +23,8 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    public WipeAsyncTask wipeAsyncTask = null;
-    public BroadcastReceiver powerBroadcastReceiver = null;
+    private WipeAsyncTask wipeAsyncTask = null;
+    private BroadcastReceiver powerBroadcastReceiver = null;
 
     private boolean isWiping = false;
 
@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void teardown() {
+    private void teardown() {
         if (this.wipeAsyncTask != null) {
             this.wipeAsyncTask.cancel(true);
             this.wipeAsyncTask = null;
@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         return status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL;
     }
 
-    public void startWipe() {
+    private void startWipe() {
         Button startWipeButton = findViewById(R.id.start_wipe_button);
         ProgressBar wipeProgressBar = findViewById(R.id.wipe_progress_bar);
 
@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
         blankingSwitch.setEnabled(false);
     }
 
-    public void stopWipe() {
+    private void stopWipe() {
         if (this.wipeAsyncTask != null) {
             this.wipeAsyncTask.cancel(true);
             this.wipeAsyncTask = null;
