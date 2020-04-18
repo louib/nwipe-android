@@ -77,8 +77,8 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
         return context.openFileInput(fileName);
     }
 
-    private void executeWipePass() {
-        long availableBytesCount = WipeAsyncTask.getAvailableBytesCount();
+    public void executeWipePass() {
+        long availableBytesCount = this.getAvailableBytesCountInternal();
         Log.i("MainActivity", String.format("Got %d bytes available for writing.", availableBytesCount));
         this.wipeJob.totalBytes = availableBytesCount;
         this.wipeJob.wipedBytes = 0;
@@ -195,6 +195,14 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
 
     protected void onPostExecute(WipeJob result) {
         this.mainActivity.onWipeFinished(result);
+    }
+
+    /**
+     * This function is required when mocking the class during
+     * unit testing.
+     */
+    public long getAvailableBytesCountInternal() {
+        return WipeAsyncTask.getAvailableBytesCount();
     }
 
     /*
