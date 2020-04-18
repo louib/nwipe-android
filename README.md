@@ -1,4 +1,5 @@
 # nwipe-android
+![Android CI badge](https://github.com/louib/nwipe-android/workflows/android_ci/badge.svg)
 
 [nwipe-android](https://github.com/louib/nwipe-android) is an application to wipe the internal storage from an Android device.
 
