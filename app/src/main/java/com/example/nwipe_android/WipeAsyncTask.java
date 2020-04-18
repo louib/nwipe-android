@@ -11,6 +11,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
@@ -67,6 +69,14 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
         }
     }
 
+    public OutputStream getOutputStream(String fileName) throws FileNotFoundException {
+        return context.openFileOutput(fileName, Context.MODE_PRIVATE);
+    }
+
+    public InputStream getInputStream(String fileName) throws FileNotFoundException {
+        return context.openFileInput(fileName);
+    }
+
     private void executeWipePass() {
         long availableBytesCount = WipeAsyncTask.getAvailableBytesCount();
         Log.i("MainActivity", String.format("Got %d bytes available for writing.", availableBytesCount));
@@ -80,10 +90,8 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
         // TODO verify that this is a proper way of seeding.
         int randomSeed = random.nextInt();
 
-        // FIXME where no doing the blanking yet!
-
         Log.i("WipeAsyncTask", "Starting wipe operation.");
-        try (FileOutputStream fos = context.openFileOutput(wipeFileName, Context.MODE_PRIVATE)) {
+        try (OutputStream fos = this.getOutputStream(wipeFileName)) {
             Random rnd = new Random();
             rnd.setSeed(randomSeed);
             byte[] bytesBuffer = new byte[WIPE_BUFFER_SIZE];
@@ -132,7 +140,7 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
         this.wipeJob.verifying = true;
 
         Log.i("WipeAsyncTask", "Starting verifying operation.");
-        try (FileInputStream fis = context.openFileInput(wipeFileName)) {
+        try (InputStream fis = this.getInputStream(wipeFileName)) {
             Random rnd = new Random();
             rnd.setSeed(randomSeed);
             byte[] bytesBuffer = new byte[WIPE_BUFFER_SIZE];
@@ -193,7 +201,7 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
      * Gets the total number of bytes available for writing in the
      * internal memory.
      */
-    private static long getAvailableBytesCount() {
+    public static long getAvailableBytesCount() {
         File path = Environment.getDataDirectory();
         StatFs stat = new StatFs(path.getPath());
         long blockSize = stat.getBlockSizeLong();
@@ -204,7 +212,7 @@ public class WipeAsyncTask extends AsyncTask <WipeJob, WipeJob, WipeJob> {
     /*
      * Gets the total number of bytes of the internal memory.
      */
-    private static long getTotalBytesCount() {
+    public static long getTotalBytesCount() {
         File path = Environment.getDataDirectory();
         StatFs stat = new StatFs(path.getPath());
         long blockSize = stat.getBlockSizeLong();
