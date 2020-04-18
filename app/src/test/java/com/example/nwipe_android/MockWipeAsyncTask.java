@@ -6,14 +6,22 @@ import java.io.OutputStream;
 public class MockWipeAsyncTask extends WipeAsyncTask {
     public int DEFAULT_AVAILABLE_SPACE = 100000;
 
+    private OutputStream out;
+    private InputStream in;
+
+    public void setStreams(InputStream in, OutputStream out) {
+        this.in = in;
+        this.out = out;
+    }
+
     @Override
     protected OutputStream getOutputStream(String filename) {
-        return new MemoryOutputStream();
+        return out;
     }
 
     @Override
     protected InputStream getInputStream(String filename) {
-        return new MemoryInputStream();
+        return in;
     }
 
     @Override

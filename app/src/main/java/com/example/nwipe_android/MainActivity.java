@@ -130,7 +130,11 @@ public class MainActivity extends AppCompatActivity {
             this.wipeAsyncTask.cancel(true);
             this.wipeAsyncTask = null;
         }
-        unregisterReceiver(this.powerBroadcastReceiver);
+        try {
+            unregisterReceiver(this.powerBroadcastReceiver);
+        } catch (IllegalArgumentException e) {
+            Log.e("MainActivity", "Could not unregister power broadcast receiver " + e.toString());
+        }
     }
 
     public void onCloseButtonClick(MenuItem item) {

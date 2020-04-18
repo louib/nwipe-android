@@ -11,10 +11,14 @@ public class MemoryInputStream extends InputStream {
 
     @Override
     public int read() throws IOException {
-        return 0;
+        return this.bytes.get(index++);
     }
 
     public void setBytes(List<Byte> bytes) {
         this.bytes = bytes;
+    }
+
+    public List<Byte> getBytes() {
+        return this.bytes;
     }
 }
