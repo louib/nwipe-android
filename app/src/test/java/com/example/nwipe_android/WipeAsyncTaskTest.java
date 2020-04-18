@@ -92,7 +92,6 @@ public class WipeAsyncTaskTest {
     }
 
     @Test
-    @Ignore("Test is ignored because of problems with the MemoryInputStream")
     public void testWithVerify() throws FileNotFoundException, InterruptedException {
         MockWipeAsyncTask asyncTask = new MockWipeAsyncTask();
 
@@ -119,5 +118,8 @@ public class WipeAsyncTaskTest {
         Assert.assertEquals(wipeJob.errorMessage, "");
         Assert.assertEquals(wipeJob.failed(), false);
         Assert.assertEquals(wipeJob.isCompleted(), true);
+
+
+        Assert.assertFalse(true);
     }
 }
