@@ -34,11 +34,29 @@ public class WipeAsyncTaskTest {
 
         asyncTask.wipe();
 
+        Assert.assertEquals(wipeJob.failed(), false);
         Assert.assertEquals(wipeJob.errorMessage, "");
+        Assert.assertEquals(wipeJob.isCompleted(), true);
+    }
+
+    @Test
+    public void testOnlyBlankingPass() throws FileNotFoundException, InterruptedException {
+        WipeAsyncTask asyncTask = new MockWipeAsyncTask();
+
+        WipeJob wipeJob = new WipeJob();
+        wipeJob.number_passes = 0;
+        wipeJob.verify = false;
+        wipeJob.blank = true;
+
+        // Sanity check.
+        Assert.assertEquals(wipeJob.isCompleted(), false);
+
+        asyncTask.wipeJob = wipeJob;
+
+        asyncTask.wipe();
 
         Assert.assertEquals(wipeJob.failed(), false);
         Assert.assertEquals(wipeJob.errorMessage, "");
-
         Assert.assertEquals(wipeJob.isCompleted(), true);
     }
 }
