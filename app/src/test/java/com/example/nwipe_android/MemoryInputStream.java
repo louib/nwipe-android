@@ -14,6 +14,14 @@ public class MemoryInputStream extends InputStream {
         return this.bytes.get(index++);
     }
 
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        for (int i = 0; i < len; ++i) {
+            b[i] = this.bytes.get(index++);
+        }
+        return len;
+    }
+
     public void setBytes(List<Byte> bytes) {
         this.bytes = bytes;
     }

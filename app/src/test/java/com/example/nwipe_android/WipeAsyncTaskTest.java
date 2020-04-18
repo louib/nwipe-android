@@ -92,7 +92,36 @@ public class WipeAsyncTaskTest {
     }
 
     @Test
-    public void testWithVerify() throws FileNotFoundException, InterruptedException {
+    public void testVerify() throws FileNotFoundException, InterruptedException {
+        MockWipeAsyncTask asyncTask = new MockWipeAsyncTask();
+
+        MemoryOutputStream out = new MemoryOutputStream();
+        MemoryInputStream in = new MemoryInputStream();
+        in.setBytes(out.getBytes());
+        asyncTask.setStreams(in, out);
+
+        WipeJob wipeJob = new WipeJob();
+        wipeJob.number_passes = 1;
+        wipeJob.verify = true;
+        wipeJob.blank = false;
+
+        // Sanity check.
+        Assert.assertEquals(wipeJob.isCompleted(), false);
+
+        asyncTask.wipeJob = wipeJob;
+
+        asyncTask.wipe();
+
+        Assert.assertEquals(out.getBytes().size(), asyncTask.DEFAULT_AVAILABLE_SPACE);
+        Assert.assertEquals(in.getBytes().size(), asyncTask.DEFAULT_AVAILABLE_SPACE);
+
+        Assert.assertEquals(wipeJob.errorMessage, "");
+        Assert.assertEquals(wipeJob.failed(), false);
+        Assert.assertEquals(wipeJob.isCompleted(), true);
+    }
+
+    @Test
+    public void testVerifyAndBlank() throws FileNotFoundException, InterruptedException {
         MockWipeAsyncTask asyncTask = new MockWipeAsyncTask();
 
         MemoryOutputStream out = new MemoryOutputStream();
