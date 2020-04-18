@@ -6,9 +6,7 @@
 
 ## Screenshots
 
-![start](./screenshots/start.png)
-![wiping](./screenshots/wiping.png)
-![success](./screenshots/success.png)
+<img src="./screenshots/start.png" alt="start" width="30%" height="30%"/><img src="./screenshots/wiping.png" alt="wiping" width="30%" height="30%"/><img src="./screenshots/success.png" alt="success" width="30%" height="30%"/>
 
 ## License
 
