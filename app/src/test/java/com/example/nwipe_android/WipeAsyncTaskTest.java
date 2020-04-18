@@ -20,30 +20,25 @@ import static org.mockito.Mockito.when;
 public class WipeAsyncTaskTest {
     @Test
     public void testSimpleWipe() throws FileNotFoundException, InterruptedException {
-        WipeAsyncTask asyncTask = mock(WipeAsyncTask.class);
-
-        doReturn((long) 10000).when(asyncTask).getAvailableBytesCountInternal();
-
-        //when(asyncTask.getAvailableBytesCount()).thenReturn((long) 100000);
-        //when(WipeAsyncTask.getTotalBytesCount()).thenReturn((long) 100000);
-
-
-        MemoryInputStream inputStream = new MemoryInputStream();
-        MemoryOutputStream outputStream = new MemoryOutputStream();
-
-        doReturn(outputStream).when(asyncTask).getOutputStream(anyString());
-        when(asyncTask.getInputStream(anyString())).thenReturn(inputStream);
+        WipeAsyncTask asyncTask = new MockWipeAsyncTask();
 
         WipeJob wipeJob = new WipeJob();
         wipeJob.number_passes = 1;
         wipeJob.verify = false;
         wipeJob.blank = false;
 
-        asyncTask.executeWipePass();
+        // Sanity check.
+        Assert.assertEquals(wipeJob.isCompleted(), false);
 
-        Assert.assertEquals(outputStream.getBytes().size(), 5);
+        asyncTask.wipeJob = wipeJob;
 
+        asyncTask.wipe();
 
+        Assert.assertEquals(wipeJob.errorMessage, "");
 
+        Assert.assertEquals(wipeJob.failed(), false);
+        Assert.assertEquals(wipeJob.errorMessage, "");
+
+        Assert.assertEquals(wipeJob.isCompleted(), true);
     }
 }
