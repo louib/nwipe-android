@@ -176,5 +176,12 @@ public class WipeAsyncTaskTest {
         Assert.assertEquals(wipeJob.errorMessage, "");
         Assert.assertEquals(wipeJob.failed(), false);
         Assert.assertEquals(wipeJob.isCompleted(), true);
+
+        // Testing that the passes are random.
+        boolean equal = true;
+        for (int i = 0; i < asyncTask.DEFAULT_AVAILABLE_SPACE; ++i) {
+            equal &= (out.getBytes().get(i) == out.getBytes().get(i + asyncTask.DEFAULT_AVAILABLE_SPACE));
+        }
+        Assert.assertFalse("The first pass and the second pass should not be the same!", equal);
     }
 }
