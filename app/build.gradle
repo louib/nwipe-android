@@ -34,7 +34,13 @@ android {
         // if true, only report errors.
         ignoreWarnings false
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8 
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
 }
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

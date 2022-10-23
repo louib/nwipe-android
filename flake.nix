@@ -37,6 +37,7 @@
           pkgs = nixpkgs.legacyPackages.${system};
           devPkgs = [
             pkgs.gradle
+            pkgs.openjdk8
           ];
           androidPackage = (
             android-nixpkgs.sdk.${system} (
