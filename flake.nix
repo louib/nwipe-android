@@ -44,9 +44,9 @@
               sdkPkgs:
                 with sdkPkgs; [
                   cmdline-tools-latest
-                  build-tools-32-0-0
+                  build-tools-33-0-0
                   platform-tools
-                  platforms-android-29
+                  platforms-android-33
                   emulator
                 ]
             )
