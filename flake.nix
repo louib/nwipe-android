@@ -34,10 +34,17 @@
     flake-utils.lib.eachDefaultSystem (
       system: (
         let
-          pkgs = nixpkgs.legacyPackages.${system};
+          pkgs = import nixpkgs {
+            inherit system;
+            config = {
+              android_sdk.accept_license = true;
+              allowUnfree = true;
+            };
+          };
           devPkgs = [
-            pkgs.gradle
+            pkgs.gradle_6
             pkgs.openjdk8
+            pkgs.androidsdk_9_0
           ];
           androidPackage = (
             android-nixpkgs.sdk.${system} (
