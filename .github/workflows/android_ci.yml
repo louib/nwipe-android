@@ -17,7 +17,7 @@ jobs:
     - name: set up Java
       uses: actions/setup-java@v4
       with:
-        java-version: '8.0.402+6'
+        java-version: '8'
         distribution: 'zulu'
 
     - uses: gradle/gradle-build-action@v2
@@ -28,7 +28,7 @@ jobs:
       run: gradle --version
 
     - name: Building project
-      run: gradle build
+      run: gradle build --no-daemon
 
     - name: Testing project
       run: gradle test
