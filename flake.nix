@@ -6,7 +6,7 @@
       url = "github:numtide/flake-utils";
     };
     nixpkgs = {
-      url = "github:NixOS/nixpkgs";
+      url = "github:NixOS/nixpkgs?ref=65f1d643032cb47e9ca92c5c7d82c1d6f51b5969";
     };
     android-nixpkgs = {
       url = "github:tadfisher/android-nixpkgs";
@@ -45,6 +45,7 @@
             pkgs.gradle_6
             pkgs.openjdk8
             pkgs.androidsdk_9_0
+            pkgs.android-studio
           ];
           androidPackage = (
             android-nixpkgs.sdk.${system} (
