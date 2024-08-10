@@ -7,6 +7,22 @@ on:
     branches: [ master ]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: set up Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: '8'
+        distribution: 'zulu'
+
+    - name: Get google java format
+      run: |
+        wget https://github.com/google/google-java-format/releases/download/v1.23.0/google-java-format-1.23.0.jar
+
+
   build:
 
     runs-on: ubuntu-latest
@@ -17,10 +33,10 @@ jobs:
     - name: set up Java
       uses: actions/setup-java@v4
       with:
-        java-version: '8'
-        distribution: 'zulu'
+        distribution: 'temurin'
+        java-version: 17
 
-    - uses: gradle/gradle-build-action@v3
+    - uses: gradle/actions/setup-gradle
       with:
         gradle-version: '7.6.3'
 
