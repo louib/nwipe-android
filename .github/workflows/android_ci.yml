@@ -1,30 +1,98 @@
-name: android_ci
+name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 
 jobs:
-  lint:
+  android-build:
+    if: contains(github.event.pull_request.labels.*.name, 'android')
     runs-on: ubuntu-latest
+    container: mobiledevops/android-sdk-image
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: 17
+
+    - name: Build debug APK
+      run: gradle
+
+    - name: Grant execute permissions for gradlew
+      run: chmod +x ./gradlew
+
+
+    - name: Build debug APK
+      run: ./gradlew assembleDebug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: app
+        path: app/build/outputs/apk/debug/app-debug.apk
+
+  docker-job:
+    if: contains(github.event.pull_request.labels.*.name, 'docker')
+    runs-on: ubuntu-latest
+    container: 
+      image: maven:3.8.4-openjdk-17
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Print Java version
+      run: java --version
+
+    - name: Print Maven version
+      run: mvn --version
+
+    - name: Print Gradle version
+      run: gradle --version
+
+    # - name: Install build tools
+    #   run: |
+    #     apt-get update -y
+    #     apt-get install wget
+    #
+    # - name: Testing project
+    #   run: ./gradlew dependencies
+
+
+  lint:
+    if: contains(github.event.pull_request.labels.*.name, 'curl-fetch')
+    runs-on: ubuntu-latest
+    container: 
+      image: maven:3.8.4-openjdk-17
     steps:
     - uses: actions/checkout@v4
 
-    - name: set up Java
-      uses: actions/setup-java@v4
-      with:
-        java-version: '8'
-        distribution: 'zulu'
-
     - name: Get google java format
       run: |
-        wget https://github.com/google/google-java-format/releases/download/v1.23.0/google-java-format-1.23.0.jar
+        curl -O https://github.com/google/google-java-format/releases/download/v1.23.0/google-java-format-1.23.0.jar -L
+        ls -l
+        mv google-java-format-1.23.0.jar google-java-format.jar
 
+    - name: Validate the checksum
+      run: |
+        checksum=$(sha256sum google-java-format.jar)
+        echo "$checksum"
+        java -jar google-java-format.jar --replace $(find src/ -name "*.java")
 
   build:
-
+    if: contains(github.event.pull_request.labels.*.name, 'setup-java')
     runs-on: ubuntu-latest
 
     steps:
@@ -36,25 +104,33 @@ jobs:
         distribution: 'temurin'
         java-version: 17
 
-    - uses: gradle/actions/setup-gradle
-      with:
-        gradle-version: '7.6.3'
+    # - uses: gradle/actions/setup-gradle
+    #   with:
+    #     gradle-version: '7.6.3'
+
+
+    # - name: Set up Gradle
+    #   run: echo "GRADLE_HOME=$(which gradle)" >> "$GITHUB_ENV"
 
     - name: Print gradle version
       run: gradle --version
 
-    - name: Building project
-      run: gradle build --no-daemon
+    # - name: Building project
+    #   run: gradle build --no-daemon
+    #
+    # - name: Testing project
+    #   run: ./gradlew dependencies
 
     - name: Testing project
       run: gradle test
 
     - name: Google Java Format
-      uses: axel-op/googlejavaformat-action@v4
+      uses: axel-op/googlejavaformat-action@v3
       with:
         args: "--set-exit-if-changed"
 
   build-with-nix-shell:
+    if: contains(github.event.pull_request.labels.*.name, 'nix')
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -67,5 +143,7 @@ jobs:
     - name: Activate Nix flake
       run: nix develop .
 
-    - name: Build the project
-      run: echo "TODO"
+    - name: Fetch the dependencies
+      run: |
+        nix develop . -c gradle
+        # nix develop . -c ./gradlew dependencies
