@@ -46,6 +46,8 @@
             pkgs.openjdk8
             pkgs.androidsdk_9_0
             pkgs.android-studio
+            pkgs.google-java-format
+            pkgs.podman
           ];
           androidPackage = (
             android-nixpkgs.sdk.${system} (
