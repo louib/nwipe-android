@@ -1,80 +1,81 @@
 {
-  description = "Nix flake for nwipe-android development";
+  description = "Nix flake for nwipe-android";
 
   inputs = {
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-    };
-    nixpkgs = {
-      url = "github:NixOS/nixpkgs?ref=65f1d643032cb47e9ca92c5c7d82c1d6f51b5969";
-    };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
     android-nixpkgs = {
       url = "github:tadfisher/android-nixpkgs";
-
-      # The main branch follows the "canary" channel of the Android SDK
-      # repository. Use another android-nixpkgs branch to explicitly
-      # track an SDK release channel.
-      #
-      # url = "github:tadfisher/android-nixpkgs/stable";
-      # url = "github:tadfisher/android-nixpkgs/beta";
-      # url = "github:tadfisher/android-nixpkgs/preview";
-      # url = "github:tadfisher/android-nixpkgs/canary";
-
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
     };
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    android-nixpkgs,
-    flake-utils,
-  }: (
-    flake-utils.lib.eachDefaultSystem (
-      system: (
-        let
-          pkgs = import nixpkgs {
-            inherit system;
-            config = {
-              android_sdk.accept_license = true;
-              allowUnfree = true;
-            };
+  outputs = { self, nixpkgs, flake-utils, android-nixpkgs }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = import nixpkgs {
+          inherit system;
+          config = {
+            android_sdk.accept_license = true;
+            allowUnfree = true;
           };
-          devPkgs = [
-            pkgs.gradle_6
-            pkgs.openjdk8
-            pkgs.androidsdk_9_0
-            pkgs.android-studio
+        };
+
+        androidSdk = android-nixpkgs.sdk.${system} (sdkPkgs: with sdkPkgs; [
+          cmdline-tools-latest
+          build-tools-33-0-0
+          platform-tools
+          platforms-android-33
+        ]);
+
+        gradle = pkgs.gradle;
+        jdk = pkgs.openjdk17;
+        aapt2 = "${androidSdk}/share/android-sdk/build-tools/33.0.0/aapt2";
+
+        nwipe-android = pkgs.stdenv.mkDerivation {
+          pname = "nwipe-android";
+          version = "0.1";
+          src = ./.;
+
+          nativeBuildInputs = [
+            gradle
+            jdk
+            androidSdk
           ];
-          androidPackage = (
-            android-nixpkgs.sdk.${system} (
-              sdkPkgs:
-                with sdkPkgs; [
-                  cmdline-tools-latest
-                  build-tools-33-0-0
-                  platform-tools
-                  platforms-android-33
-                  emulator
-                ]
-            )
-          );
-        in {
-          devShell = pkgs.mkShell {
-            buildInputs = devPkgs ++ [androidPackage];
-            nativeBuildInputs = devPkgs ++ [androidPackage];
-          };
-          /*
-          defaultPackage = pkgs.androidPlatform.buildAndroidPackage {
-            pname = "nwipe-android";
-            # TODO fetch the version from the manifest.
-            version = "0.0.1";
-            buildInputs = devPkgs;
-            nativeBuildInputs = devPkgs;
-          };
-          */
-        }
-      )
-    )
-  );
+
+          buildPhase = ''
+            export GRADLE_USER_HOME=$(mktemp -d)
+            export ANDROID_HOME=${androidSdk}/share/android-sdk
+            
+            # Update gradle.properties with the correct aapt2 path
+            sed -i "s|android.aapt2FromMavenOverride=.*|android.aapt2FromMavenOverride=${aapt2}|" gradle.properties
+
+            gradle --no-daemon assembleRelease assembleDebug
+          '';
+
+          installPhase = ''
+            mkdir -p $out
+            find app/build/outputs/apk -name "*.apk" -exec cp {} $out/ \;
+          '';
+        };
+      in
+      {
+        packages.default = nwipe-android;
+        devShells.default = pkgs.mkShell {
+          buildInputs = [
+            gradle
+            jdk
+            androidSdk
+          ];
+          shellHook = ''
+            export ANDROID_HOME="${androidSdk}/share/android-sdk"
+            # Update gradle.properties with the correct aapt2 path in the current directory
+            # (only if we want to allow the user to run gradle directly)
+            # Actually, it's better to just set it via alias or environment if possible,
+            # but gradle.properties is most reliable for daemons.
+            sed -i "s|android.aapt2FromMavenOverride=.*|android.aapt2FromMavenOverride=${aapt2}|" gradle.properties
+          '';
+        };
+      }
+    );
 }
