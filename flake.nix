@@ -30,6 +30,7 @@
 
         gradle = pkgs.gradle;
         jdk = pkgs.openjdk17;
+        google-java-format = pkgs.google-java-format;
         aapt2 = "${androidSdk}/share/android-sdk/build-tools/33.0.0/aapt2";
 
         # Create a wrapper for gradle that always includes the aapt2 override
@@ -46,6 +47,7 @@
             gradle-wrapped
             jdk
             androidSdk
+            google-java-format
           ];
 
           buildPhase = ''
@@ -67,11 +69,13 @@
             gradle-wrapped
             jdk
             androidSdk
+            google-java-format
           ];
           shellHook = ''
             export ANDROID_HOME="${androidSdk}/share/android-sdk"
             # Ensure GRADLE_OPTS also carries the override for any other way gradle might be called
             export GRADLE_OPTS="-Dorg.gradle.project.android.aapt2FromMavenOverride=${aapt2}"
+            alias format='google-java-format --replace $(find . -path "*/build" -prune -o -name "*.java" -print)'
           '';
         };
       }

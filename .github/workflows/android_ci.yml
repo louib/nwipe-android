@@ -7,28 +7,23 @@ on:
     branches: [ master ]
 
 jobs:
-  lint:
+  format-check:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
 
-    - name: set up Java
-      uses: actions/setup-java@v4
+    - name: Install Nix
+      uses: cachix/install-nix-action@v27
       with:
-        java-version: '8'
-        distribution: 'zulu'
+        nix_path: nixpkgs=channel:nixos-unstable
 
-    - name: Get google java format
+    - name: Check Java Formatting
       run: |
-        wget https://github.com/google/google-java-format/releases/download/v1.23.0/google-java-format-1.23.0.jar
-
-    - name: Google Java Format
-      uses: axel-op/googlejavaformat-action@v4
-      with:
-        args: "--set-exit-if-changed"
+        nix develop .# -c sh -c 'google-java-format --dry-run --set-exit-if-changed $(find . -path "*/build" -prune -o -name "*.java" -print)'
 
   build:
     runs-on: ubuntu-latest
+    needs: format-check
     steps:
     - uses: actions/checkout@v4
 

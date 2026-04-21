@@ -1,81 +1,74 @@
 package com.example.nwipe_android;
 
 public class WipeJob {
-    public static final int MAX_NUMBER_PASSES = 10;
-    public static final int DEFAULT_NUMBER_PASSES = 3;
-    public static final boolean DEFAULT_VERIFY = false;
-    public static final boolean DEFAULT_BLANK = true;
-    /**
-     * Minimum percentage of completion to consider a pass a successfully written.
-     */
-    public static final int MIN_PERCENTAGE_COMPLETION = 98;
+  public static final int MAX_NUMBER_PASSES = 10;
+  public static final int DEFAULT_NUMBER_PASSES = 3;
+  public static final boolean DEFAULT_VERIFY = false;
+  public static final boolean DEFAULT_BLANK = true;
 
-    /**
-     * Parameters to the job.
-     */
-    public int number_passes;
-    public boolean verify;
-    public boolean blank;
+  /** Minimum percentage of completion to consider a pass a successfully written. */
+  public static final int MIN_PERCENTAGE_COMPLETION = 98;
 
-    /**
-     * Completion status.
-     */
-    public int passes_completed = 0;
-    public String errorMessage = "";
+  /** Parameters to the job. */
+  public int number_passes;
 
-    /**
-     * Information on the current pass.
-     */
-    public long totalBytes;
-    public long wipedBytes = 0;
-    public boolean verifying = false;
+  public boolean verify;
+  public boolean blank;
 
-    public String toString() {
-        String completionText = String.format(" (%d%%)", this.getCurrentPassPercentageCompletion());
+  /** Completion status. */
+  public int passes_completed = 0;
 
-        if (this.failed()) {
-            return "Failed" + completionText;
-        }
+  public String errorMessage = "";
 
-        if (this.isCompleted()) {
-            return "Succeeded";
-        }
+  /** Information on the current pass. */
+  public long totalBytes;
 
-        if (this.isBlankingPass() && this.blank) {
-            if (this.verifying) {
-                return "Verifying Blanking pass" + completionText;
-            } else {
-                return "Blanking pass" + completionText;
-            }
-        }
+  public long wipedBytes = 0;
+  public boolean verifying = false;
 
-        if (this.verifying) {
-            return String.format(
-                    "Verifying Pass %d/%d%s",
-                    this.passes_completed + 1,
-                    this.number_passes,
-                    completionText
-            );
-        }
-        return String.format("Pass %d/%d%s", this.passes_completed + 1, this.number_passes, completionText);
+  public String toString() {
+    String completionText = String.format(" (%d%%)", this.getCurrentPassPercentageCompletion());
+
+    if (this.failed()) {
+      return "Failed" + completionText;
     }
 
-    public int getCurrentPassPercentageCompletion() {
-        return (int)(((double)this.wipedBytes / (double)this.totalBytes) * 100);
+    if (this.isCompleted()) {
+      return "Succeeded";
     }
 
-    public boolean isBlankingPass() {
-        return this.passes_completed == this.number_passes;
+    if (this.isBlankingPass() && this.blank) {
+      if (this.verifying) {
+        return "Verifying Blanking pass" + completionText;
+      } else {
+        return "Blanking pass" + completionText;
+      }
     }
 
-    public boolean isCompleted() {
-        if (this.blank) {
-            return this.passes_completed > this.number_passes;
-        }
-        return this.passes_completed == this.number_passes;
+    if (this.verifying) {
+      return String.format(
+          "Verifying Pass %d/%d%s", this.passes_completed + 1, this.number_passes, completionText);
     }
+    return String.format(
+        "Pass %d/%d%s", this.passes_completed + 1, this.number_passes, completionText);
+  }
 
-    public boolean failed() {
-        return !this.errorMessage.isEmpty();
+  public int getCurrentPassPercentageCompletion() {
+    return (int) (((double) this.wipedBytes / (double) this.totalBytes) * 100);
+  }
+
+  public boolean isBlankingPass() {
+    return this.passes_completed == this.number_passes;
+  }
+
+  public boolean isCompleted() {
+    if (this.blank) {
+      return this.passes_completed > this.number_passes;
     }
+    return this.passes_completed == this.number_passes;
+  }
+
+  public boolean failed() {
+    return !this.errorMessage.isEmpty();
+  }
 }
