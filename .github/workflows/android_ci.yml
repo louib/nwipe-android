@@ -22,39 +22,12 @@ jobs:
       run: |
         wget https://github.com/google/google-java-format/releases/download/v1.23.0/google-java-format-1.23.0.jar
 
-
-  build:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: set up Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: 17
-
-    - uses: gradle/actions/setup-gradle
-      with:
-        gradle-version: '7.6.3'
-
-    - name: Print gradle version
-      run: gradle --version
-
-    - name: Building project
-      run: gradle build --no-daemon
-
-    - name: Testing project
-      run: gradle test
-
     - name: Google Java Format
       uses: axel-op/googlejavaformat-action@v4
       with:
         args: "--set-exit-if-changed"
 
-  build-with-nix-shell:
+  build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -64,8 +37,12 @@ jobs:
       with:
         nix_path: nixpkgs=channel:nixos-unstable
 
-    - name: Activate Nix flake
-      run: nix develop .
+    - name: Build and Test with Nix
+      run: |
+        nix develop .# -c gradle assembleRelease assembleDebug test --no-daemon
 
-    - name: Build the project
-      run: echo "TODO"
+    - name: Upload APKs
+      uses: actions/upload-artifact@v4
+      with:
+        name: nwipe-android-apks
+        path: app/build/outputs/apk/**/*.apk
