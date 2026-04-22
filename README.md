@@ -41,6 +41,36 @@ This project includes a Nix flake for reproducible builds without requiring Andr
 
 The resulting APK will be at `app/build/outputs/apk/release/app-release-unsigned.apk`.
 
+### Running the application
+
+If you have an Android device or emulator connected with `adb` access, you can build, install, and run the debug version in one command:
+
+```bash
+nix develop .# -c run
+```
+
+This will:
+1.  Build the debug APK.
+2.  Install it on the connected device.
+3.  Launch the main activity.
+
+### Running on an emulator
+
+If you don't have a physical device, you can create and run an emulator:
+
+1.  **Create the emulator (one-time setup):**
+    ```bash
+    nix develop .# -c emu-create
+    ```
+2.  **Launch the emulator:**
+    ```bash
+    nix develop .# -c emu
+    ```
+3.  **Run the app (in a separate terminal):**
+    ```bash
+    nix develop .# -c run
+    ```
+
 ## License
 
 GPL-3.0

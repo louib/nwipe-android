@@ -26,6 +26,8 @@
           build-tools-33-0-0
           platform-tools
           platforms-android-33
+          emulator
+          system-images-android-33-google-apis-x86-64
         ]);
 
         gradle = pkgs.gradle;
@@ -75,7 +77,13 @@
             export ANDROID_HOME="${androidSdk}/share/android-sdk"
             # Ensure GRADLE_OPTS also carries the override for any other way gradle might be called
             export GRADLE_OPTS="-Dorg.gradle.project.android.aapt2FromMavenOverride=${aapt2}"
+            
             alias format='google-java-format --replace $(find . -path "*/build" -prune -o -name "*.java" -print)'
+            alias run='gradle assembleDebug && adb install -r app/build/outputs/apk/debug/app-debug.apk && adb shell am start -n com.example.nwipe_android/.MainActivity'
+            
+            # Helper to create and run an emulator
+            alias emu-create='avdmanager create avd -n nwipe -k "system-images;android-33;google_apis;x86_64"'
+            alias emu='emulator -avd nwipe'
           '';
         };
       }
