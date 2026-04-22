@@ -55,12 +55,14 @@
           buildPhase = ''
             export GRADLE_USER_HOME=$(mktemp -d)
             export ANDROID_HOME=${androidSdk}/share/android-sdk
-            gradle --no-daemon assembleRelease assembleDebug
+            # Build APKs (default) and Bundles
+            gradle --no-daemon assembleRelease assembleDebug bundleRelease
           '';
 
           installPhase = ''
-            mkdir -p $out
-            find app/build/outputs/apk -name "*.apk" -exec cp {} $out/ \;
+            mkdir -p $out/apks $out/bundles
+            find app/build/outputs/apk -name "*.apk" -exec cp {} $out/apks/ \;
+            find app/build/outputs/bundle -name "*.aab" -exec cp {} $out/bundles/ \;
           '';
         };
       in
@@ -75,15 +77,24 @@
           ];
           shellHook = ''
             export ANDROID_HOME="${androidSdk}/share/android-sdk"
-            # Ensure GRADLE_OPTS also carries the override for any other way gradle might be called
             export GRADLE_OPTS="-Dorg.gradle.project.android.aapt2FromMavenOverride=${aapt2}"
             
             alias format='google-java-format --replace $(find . -path "*/build" -prune -o -name "*.java" -print)'
             alias run='gradle assembleDebug && adb install -r app/build/outputs/apk/debug/app-debug.apk && adb shell am start -n com.example.nwipe_android/.MainActivity'
-            
-            # Helper to create and run an emulator
             alias emu-create='avdmanager create avd -n nwipe -k "system-images;android-33;google_apis;x86_64"'
             alias emu='emulator -avd nwipe'
+            
+            # New commands for AAB and Signing
+            alias bundle='gradle bundleRelease'
+            alias sign-help='echo "To sign, run: gradle assembleRelease -Pandroid.injected.signing.store.file=/path/to/keystore.jks -Pandroid.injected.signing.store.password=pass -Pandroid.injected.signing.key.alias=alias -Pandroid.injected.signing.key.password=pass"'
+
+            echo "Nix Android Dev Shell"
+            echo "---------------------"
+            echo "run       : Build/Install/Launch APK"
+            echo "bundle    : Create App Bundle (.aab)"
+            echo "sign-help : Show how to sign APKs/AABs"
+            echo "format    : Format Java code"
+            echo "emu       : Launch emulator"
           '';
         };
       }

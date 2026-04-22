@@ -71,6 +71,23 @@ If you don't have a physical device, you can create and run an emulator:
     nix develop .# -c run
     ```
 
+### Signed Builds and App Bundles (.aab)
+
+To produce an **Android App Bundle** (required for Google Play), run:
+```bash
+nix develop .# -c bundle
+```
+
+To produce a **Signed** APK or AAB without modifying the codebase, you can pass your keystore information directly to Gradle:
+
+```bash
+nix develop .# -c gradle assembleRelease \
+  -Pandroid.injected.signing.store.file=/path/to/keystore.jks \
+  -Pandroid.injected.signing.store.password=your_password \
+  -Pandroid.injected.signing.key.alias=your_alias \
+  -Pandroid.injected.signing.key.password=your_password
+```
+
 ## License
 
 GPL-3.0
